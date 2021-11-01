@@ -1,7 +1,7 @@
 {
   "name": "shaderity-graph-shaderpack",
   "version": "0.0.1",
-  "main": "index.js",
+  "main": "dist/esm/index.js",
   "repository": "https://github.com/actnwit/shaderity-graph-shaderpack",
   "author": "Yuki Shimada <emadurandal@gmail.com>",
   "license": "MIT",
