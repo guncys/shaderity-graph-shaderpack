@@ -2513,6 +2513,13 @@ serialize-javascript@^6.0.0:
   dependencies:
     randombytes "^2.1.0"
 
+shaderity-graph@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/shaderity-graph/-/shaderity-graph-0.1.2.tgz#6d2559bd41a3ebe0b2ce6ca7fe7ce1746dd40399"
+  integrity sha512-nP1lbmskk+p9+kWQDl+PkS9UtHtJ9OtTaaFN0hxlDeapaitUUAQ04KI2BTW1p+VlV2dQ9tYTiDyQOc7OUu3KMw==
+  dependencies:
+    shaderity "^0.2.2"
+
 shaderity@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/shaderity/-/shaderity-0.2.2.tgz#0963594287a66565f1a72c0828bb4f91c5dcde18"
