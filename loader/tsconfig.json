@@ -1,0 +1,32 @@
+{
+  "extends": "./../node_modules/gts/tsconfig-google.json",
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "umd",
+    "lib": [
+      "dom",
+      "es2017"
+    ],
+    "outDir": "./dist",
+    "declaration": false,
+    "sourceMap": false,
+    "downlevelIteration": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "exclude": [],
+  "include": [
+    "./*.ts",
+  ]
+}

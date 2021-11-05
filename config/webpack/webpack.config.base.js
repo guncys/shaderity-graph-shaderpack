@@ -12,7 +12,7 @@ module.exports = {
           {
             loader: path.resolve(
               __dirname,
-              './../../loader/shaderpackLoader.js'
+              './../../loader/dist/loader/shaderpackLoader.js'
             ),
           },
         ],
