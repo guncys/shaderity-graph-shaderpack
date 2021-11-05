@@ -9,11 +9,6 @@ module.exports = {
         use: ['shaderity-loader'],
       },
       {
-        test: /VERSION-FILE$/,
-        exclude: /node_modules/,
-        use: ['version-loader'],
-      },
-      {
         test: /\.json$/,
         exclude: /node_modules/,
         use: ['json-loader'],
