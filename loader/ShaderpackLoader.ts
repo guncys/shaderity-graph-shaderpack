@@ -55,3 +55,25 @@ function __getCommentsForShaderityGraphShaderPack(
 
   return sGSPcomments;
 }
+
+/**
+ *
+ * @param sGSPcomments array of comments for this loader
+ * @param reg Regular expression for the parameter to be extracted.
+ *            The format is '/^paramName[\t ]*:[\t ]*(.*)$/'
+ */
+function __getFirstParamFromSGSPcomment(
+  sGSPcomments: SGSPcomment[],
+  reg: RegExp
+): string {
+  for (let i = 0; i < sGSPcomments.length; i++) {
+    const sGSPcontent = sGSPcomments[i].content;
+
+    const matchedParam = sGSPcontent.match(reg);
+    if (matchedParam != null) {
+      return matchedParam[1];
+    }
+  }
+
+  return '';
+}
