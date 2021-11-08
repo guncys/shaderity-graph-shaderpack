@@ -23,6 +23,11 @@ module.exports = function (source: string) {
   console.log('SGSPcomments');
   console.log(sGSPcomments);
 
+  __setParamsFromSGSPcomments(resultJson, sGSPcomments);
+
+  console.log('resultJson');
+  console.log(resultJson);
+
   return `export default ${JSON.stringify(resultJson)}`;
 };
 
@@ -40,7 +45,6 @@ function __getCommentsForShaderityGraphShaderPack(
   const sGSPcomments: SGSPcomment[] = [];
 
   const regSGSP = /^[\t ]*\/\/[\t ]*<[\t ]*SGSP[\t ]*>(.*)$/;
-
   for (let i = 0; i < shaderCodeLines.length; i++) {
     const line = shaderCodeLines[i];
 
@@ -54,6 +58,18 @@ function __getCommentsForShaderityGraphShaderPack(
   }
 
   return sGSPcomments;
+}
+
+function __setParamsFromSGSPcomments(
+  json: ShaderNodeData,
+  sGSPcomments: SGSPcomment[]
+) {
+  __setNodeName(json, sGSPcomments);
+}
+
+function __setNodeName(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
+  const regNodeName = /^NodeName[\t ]*:[\t ]*(.*)$/;
+  json.nodeName = __getFirstParamFromSGSPcomment(sGSPcomments, regNodeName);
 }
 
 /**
