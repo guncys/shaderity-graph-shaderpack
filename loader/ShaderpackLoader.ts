@@ -37,6 +37,7 @@ module.exports = function (source: string) {
 // =========================================================================================================
 
 const regSGSP = /^[\t ]*\/\/[\t ]*<[\t ]*SGSP[\t ]*>(.*)$/;
+const regExtension = /^[\t ]*#[\t ]*extension[\t ]*(.*):.*$/;
 
 function __splitByLineFeedCode(str: string) {
   return str.split(/\r\n|\n/);
@@ -74,6 +75,7 @@ function __setParamsFromShaderCode(
     __createSplittedShaderFunctionCode(splittedOriginalCode);
 
   __setShaderFunctionCode(json, splittedShaderFunctionCode);
+  __setExtension(json, splittedOriginalCode);
 }
 
 /**
@@ -87,7 +89,6 @@ function __setParamsFromShaderCode(
 function __createSplittedShaderFunctionCode(splittedOriginalCode: string[]) {
   const splittedShaderCode = [];
   const regPrecision = /^[\t ]*precision/;
-  const regExtension = /^[\t ]*#[\t ]*extension/;
 
   for (let i = 0; i < splittedOriginalCode.length; i++) {
     if (
@@ -115,6 +116,17 @@ function __setShaderFunctionCode(
   splittedShaderFunctionCode: string[]
 ) {
   json.shaderFunctionCode = __joinSplittedLine(splittedShaderFunctionCode);
+}
+
+function __setExtension(json: ShaderNodeData, splittedOriginalCode: string[]) {
+  for (let i = 0; i < splittedOriginalCode.length; i++) {
+    const matchedLine = splittedOriginalCode[i].match(regExtension);
+
+    if (matchedLine != null) {
+      const extensionName = matchedLine[1].trim();
+      json.extensions.push(extensionName);
+    }
+  }
 }
 
 function __setParamsFromSGSPcomments(

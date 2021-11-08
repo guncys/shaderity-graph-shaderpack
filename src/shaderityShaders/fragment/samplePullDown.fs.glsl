@@ -8,6 +8,7 @@
 precision highp float;
 
 // Note: Only "enable" extension behavior is supported.
+//       No matter which behavior you choose, the behavior will be "enable".
 #extension GL_OES_standard_derivatives : enable
 
 // <SGSP> PullDownStr: optionA
