@@ -66,6 +66,7 @@ function __setParamsFromSGSPcomments(
 ) {
   __setNodeName(json, sGSPcomments);
   __setAvailableShaderStage(json, sGSPcomments);
+  __setGUIMode(json, sGSPcomments);
 }
 
 function __setNodeName(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
@@ -83,6 +84,12 @@ function __setAvailableShaderStage(
     regAvailableShaderStage
   );
   json.availableShaderStage = AvailableShaderStage.fromString(matchedStr);
+}
+
+function __setGUIMode(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
+  const regGUIMode = /^GUIMode[\t ]*:[\t ]*(.*)$/;
+  const matchedStr = __getFirstParamFromSGSPcomment(sGSPcomments, regGUIMode);
+  json.guiMode = GUIMode.fromString(matchedStr);
 }
 
 /**
