@@ -65,11 +65,24 @@ function __setParamsFromSGSPcomments(
   sGSPcomments: SGSPcomment[]
 ) {
   __setNodeName(json, sGSPcomments);
+  __setAvailableShaderStage(json, sGSPcomments);
 }
 
 function __setNodeName(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
   const regNodeName = /^NodeName[\t ]*:[\t ]*(.*)$/;
   json.nodeName = __getFirstParamFromSGSPcomment(sGSPcomments, regNodeName);
+}
+
+function __setAvailableShaderStage(
+  json: ShaderNodeData,
+  sGSPcomments: SGSPcomment[]
+) {
+  const regAvailableShaderStage = /^AvailableShaderStage[\t ]*:[\t ]*(.*)$/;
+  const matchedStr = __getFirstParamFromSGSPcomment(
+    sGSPcomments,
+    regAvailableShaderStage
+  );
+  json.availableShaderStage = AvailableShaderStage.fromString(matchedStr);
 }
 
 /**
