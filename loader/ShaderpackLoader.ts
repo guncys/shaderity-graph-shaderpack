@@ -16,5 +16,18 @@ module.exports = function (source: string) {
     guiOptions: {},
   };
 
+  const splittedCode = __splitByLineFeedCode(source);
+
+  console.log('splittedCode');
+  console.log(splittedCode);
+
   return `export default ${JSON.stringify(resultJson)}`;
 };
+
+// =========================================================================================================
+// private functions
+// =========================================================================================================
+
+function __splitByLineFeedCode(str: string) {
+  return str.split(/\r\n|\n/);
+}
