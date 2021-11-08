@@ -7,7 +7,7 @@ module.exports = function (source: string) {
 
   const resultJson: ShaderNodeData = {
     shaderFunctionName: '',
-    shaderFunctionCode: source,
+    shaderFunctionCode: '',
     extensions: [],
     socketDataArray: [],
     nodeName: '',
@@ -16,13 +16,14 @@ module.exports = function (source: string) {
     guiOptions: {},
   };
 
-  const splittedCode = __splitByLineFeedCode(source);
+  const splittedOriginalCode = __splitByLineFeedCode(source);
   const sGSPcomments: SGSPcomment[] =
-    __getCommentsForShaderityGraphShaderPack(splittedCode);
+    __getCommentsForShaderityGraphShaderPack(splittedOriginalCode);
 
   console.log('SGSPcomments');
   console.log(sGSPcomments);
 
+  __setParamsFromShaderCode(resultJson, splittedOriginalCode);
   __setParamsFromSGSPcomments(resultJson, sGSPcomments);
 
   console.log('resultJson');
@@ -39,6 +40,10 @@ const regSGSP = /^[\t ]*\/\/[\t ]*<[\t ]*SGSP[\t ]*>(.*)$/;
 
 function __splitByLineFeedCode(str: string) {
   return str.split(/\r\n|\n/);
+}
+
+function __joinSplittedLine(splittedLine: string[]) {
+  return splittedLine.join('\n');
 }
 
 function __getCommentsForShaderityGraphShaderPack(
@@ -59,6 +64,16 @@ function __getCommentsForShaderityGraphShaderPack(
   }
 
   return sGSPcomments;
+}
+
+function __setParamsFromShaderCode(
+  json: ShaderNodeData,
+  splittedOriginalCode: string[]
+) {
+  const splittedShaderFunctionCode =
+    __createSplittedShaderFunctionCode(splittedOriginalCode);
+
+  __setShaderFunctionCode(json, splittedShaderFunctionCode);
 }
 
 /**
@@ -93,6 +108,13 @@ function __createSplittedShaderFunctionCode(splittedOriginalCode: string[]) {
   }
 
   return splittedShaderCode;
+}
+
+function __setShaderFunctionCode(
+  json: ShaderNodeData,
+  splittedShaderFunctionCode: string[]
+) {
+  json.shaderFunctionCode = __joinSplittedLine(splittedShaderFunctionCode);
 }
 
 function __setParamsFromSGSPcomments(
