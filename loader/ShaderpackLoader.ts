@@ -35,6 +35,8 @@ module.exports = function (source: string) {
 // private functions
 // =========================================================================================================
 
+const regSGSP = /^[\t ]*\/\/[\t ]*<[\t ]*SGSP[\t ]*>(.*)$/;
+
 function __splitByLineFeedCode(str: string) {
   return str.split(/\r\n|\n/);
 }
@@ -44,7 +46,6 @@ function __getCommentsForShaderityGraphShaderPack(
 ): SGSPcomment[] {
   const sGSPcomments: SGSPcomment[] = [];
 
-  const regSGSP = /^[\t ]*\/\/[\t ]*<[\t ]*SGSP[\t ]*>(.*)$/;
   for (let i = 0; i < shaderCodeLines.length; i++) {
     const line = shaderCodeLines[i];
 
@@ -58,6 +59,40 @@ function __getCommentsForShaderityGraphShaderPack(
   }
 
   return sGSPcomments;
+}
+
+/**
+ * Create a splitted shader function code by removing unnecessary
+ * lines from the original splitted code.
+ * The splitted shader function code does not need the following:
+ * 1. comment for this library ('// <SGSP>~')
+ * 2. global precision (This may be necessary to enable the use of Linter in the fragment shader)
+ * 3. extension
+ */
+function __createSplittedShaderFunctionCode(splittedOriginalCode: string[]) {
+  const splittedShaderCode = [];
+  const regPrecision = /^[\t ]*precision/;
+  const regExtension = /^[\t ]*#[\t ]*extension/;
+
+  for (let i = 0; i < splittedOriginalCode.length; i++) {
+    if (
+      splittedOriginalCode[i].match(regSGSP) != null ||
+      splittedOriginalCode[i].match(regPrecision) != null ||
+      splittedOriginalCode[i].match(regExtension) != null
+    ) {
+      continue;
+    }
+
+    const prevLine = splittedShaderCode?.[splittedShaderCode.length - 1] ?? '';
+
+    if (prevLine === '' && splittedOriginalCode[i] === '') {
+      continue;
+    }
+
+    splittedShaderCode.push(splittedOriginalCode[i]);
+  }
+
+  return splittedShaderCode;
 }
 
 function __setParamsFromSGSPcomments(
