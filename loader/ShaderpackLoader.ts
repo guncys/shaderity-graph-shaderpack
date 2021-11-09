@@ -73,6 +73,7 @@ function __setParamsFromShaderCode(
   const splittedShaderFunctionCode =
     __createSplittedShaderFunctionCode(splittedOriginalCode);
 
+  __setShaderFunctionName(json, splittedShaderFunctionCode);
   __setShaderFunctionCode(json, splittedShaderFunctionCode);
   __setExtension(json, splittedOriginalCode);
 }
@@ -108,6 +109,22 @@ function __createSplittedShaderFunctionCode(splittedOriginalCode: string[]) {
   }
 
   return splittedShaderCode;
+}
+
+function __setShaderFunctionName(
+  json: ShaderNodeData,
+  splittedShaderFunctionCode: string[]
+) {
+  const regVoidFunc = /^[\t ]*void[\t ]*(.+)\(/;
+
+  for (let i = 0; i < splittedShaderFunctionCode.length; i++) {
+    const line = splittedShaderFunctionCode[i];
+    const matchedLine = line.match(regVoidFunc);
+    if (matchedLine != null) {
+      json.shaderFunctionName = matchedLine[1].trim();
+      return;
+    }
+  }
 }
 
 function __setShaderFunctionCode(
