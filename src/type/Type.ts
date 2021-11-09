@@ -3,6 +3,11 @@ import {SocketData as _SocketData} from 'shaderity-graph';
 
 export type SocketData = _SocketData;
 
+export interface PullDownItem {
+  functionName: string;
+  displayName?: string;
+}
+
 export interface ShaderNodeData {
   shaderFunctionName: string;
   shaderFunctionCode: string;
@@ -15,7 +20,8 @@ export interface ShaderNodeData {
   guiMode: GUIModeEnum;
   guiOptions?: {
     pullDown?: {
-      shaderFunctionNames: Array<string>;
+      description: string;
+      items: PullDownItem[];
     };
   };
 }

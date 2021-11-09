@@ -1,5 +1,5 @@
 import {CustomNodeModule, SGSPcomment} from './ShaderpackLoaderType';
-import {ShaderNodeData} from './../src/type/Type';
+import {PullDownItem, ShaderNodeData} from './../src/type/Type';
 import {AvailableShaderStage, GUIMode} from '../src/type/Enum';
 
 module.exports = function (source: string) {
@@ -12,7 +12,6 @@ module.exports = function (source: string) {
     nodeName: '',
     availableShaderStage: AvailableShaderStage.Unknown,
     guiMode: GUIMode.Unknown,
-    guiOptions: {},
   };
 
   const splittedOriginalCode = __splitByLineFeedCode(source);
@@ -24,6 +23,7 @@ module.exports = function (source: string) {
 
   __setParamsFromShaderCode(resultJson, splittedOriginalCode);
   __setParamsFromSGSPcomments(resultJson, sGSPcomments);
+  __setGUIOptions(resultJson, splittedOriginalCode);
 
   console.log('resultJson');
   console.log(resultJson);
@@ -37,6 +37,7 @@ module.exports = function (source: string) {
 
 const regSGSP = /^[\t ]*\/\/[\t ]*<[\t ]*SGSP[\t ]*>(.*)$/;
 const regExtension = /^[\t ]*#[\t ]*extension[\t ]*(.*):.*$/;
+const regVoidFuncStart = /^[\t ]*void[\t ]*(.+)\(/;
 
 function __splitByLineFeedCode(str: string) {
   return str.split(/\r\n|\n/);
@@ -115,11 +116,9 @@ function __setShaderFunctionName(
   json: ShaderNodeData,
   splittedShaderFunctionCode: string[]
 ) {
-  const regVoidFunc = /^[\t ]*void[\t ]*(.+)\(/;
-
   for (let i = 0; i < splittedShaderFunctionCode.length; i++) {
     const line = splittedShaderFunctionCode[i];
-    const matchedLine = line.match(regVoidFunc);
+    const matchedLine = line.match(regVoidFuncStart);
     if (matchedLine != null) {
       json.shaderFunctionName = matchedLine[1].trim();
       return;
@@ -202,4 +201,59 @@ function __getFirstParamFromSGSPcomment(
   }
 
   return '';
+}
+
+// The __setGUIMode method must be executed prior to this method
+function __setGUIOptions(json: ShaderNodeData, splittedOriginalCode: string[]) {
+  if (json.guiMode === GUIMode.PullDown) {
+    __setGUIPullDownOptions(json, splittedOriginalCode);
+  }
+}
+
+function __setGUIPullDownOptions(
+  json: ShaderNodeData,
+  splittedOriginalCode: string[]
+) {
+  json.guiOptions = json.guiOptions ?? {};
+  json.guiOptions.pullDown = {
+    description: '',
+    items: [],
+  };
+
+  const regPullDownDescription = /^PullDown_Description[\t ]*:[\t ]*(.*)$/;
+  const regPullDownDisplayName = /^PullDown_DisplayName[\t ]*:[\t ]*(.*)$/;
+
+  let displayName: string | undefined;
+  for (let i = 0; i < splittedOriginalCode.length; i++) {
+    const line = splittedOriginalCode[i];
+
+    const matchedLineSGSP = line.match(regSGSP);
+    if (matchedLineSGSP != null) {
+      const sGSPcomment = matchedLineSGSP[1].trim();
+
+      const matchedDescription = sGSPcomment.match(regPullDownDescription);
+      if (matchedDescription != null) {
+        json.guiOptions.pullDown.description = matchedDescription[1].trim();
+        continue;
+      }
+
+      const matchedDisplayName = sGSPcomment.match(regPullDownDisplayName);
+      if (matchedDisplayName != null) {
+        displayName = matchedDisplayName[1].trim();
+        continue;
+      }
+    }
+
+    const matchedLineVoidFunc = line.match(regVoidFuncStart);
+    if (matchedLineVoidFunc != null) {
+      const functionName = matchedLineVoidFunc[1].trim();
+
+      const item: PullDownItem = {functionName};
+      if (displayName != null) {
+        item.displayName = displayName;
+        displayName = undefined;
+      }
+      json.guiOptions.pullDown.items.push(item);
+    }
+  }
 }
