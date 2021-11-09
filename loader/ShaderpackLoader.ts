@@ -1,5 +1,16 @@
 import {CustomNodeModule, SGSPcomment} from './ShaderpackLoaderType';
-import {PullDownItem, ShaderNodeData} from './../src/type/Type';
+import {
+  AttributeInputSocketData,
+  PullDownItem,
+  ShaderNodeData,
+  ShaderPrecisionType,
+  SocketDirectionEnum,
+  StandardInputSocketData,
+  StandardOutputSocketData,
+  UniformInputSocketData,
+  VaryingInputSocketData,
+  VaryingOutputSocketData,
+} from './../src/type/Type';
 import {AvailableShaderStage, GUIMode} from '../src/type/Enum';
 
 module.exports = function (source: string) {
@@ -37,7 +48,7 @@ module.exports = function (source: string) {
 
 const regSGSP = /^[\t ]*\/\/[\t ]*<[\t ]*SGSP[\t ]*>(.*)$/;
 const regExtension = /^[\t ]*#[\t ]*extension[\t ]*(.*):.*$/;
-const regVoidFuncStart = /^[\t ]*void[\t ]*(.+)\(/;
+const regVoidFuncStart = /^[\t ]*void[\t ]*(\w+)\(/;
 
 function __splitByLineFeedCode(str: string) {
   return str.split(/\r\n|\n/);
@@ -74,7 +85,7 @@ function __setParamsFromShaderCode(
   const splittedShaderFunctionCode =
     __createSplittedShaderFunctionCode(splittedOriginalCode);
 
-  __setShaderFunctionName(json, splittedShaderFunctionCode);
+  __setShaderFunctionNameAndSocketData(json, splittedShaderFunctionCode);
   __setShaderFunctionCode(json, splittedShaderFunctionCode);
   __setExtension(json, splittedOriginalCode);
 }
@@ -112,18 +123,201 @@ function __createSplittedShaderFunctionCode(splittedOriginalCode: string[]) {
   return splittedShaderCode;
 }
 
-function __setShaderFunctionName(
+function __setShaderFunctionNameAndSocketData(
   json: ShaderNodeData,
   splittedShaderFunctionCode: string[]
 ) {
+  const shaderFunctionLineNumber =
+    __setShaderFunctionNameAndGetShaderFunctionLineNumber(
+      json,
+      splittedShaderFunctionCode
+    );
+
+  const shaderFuncArgs = __getShaderFuncArgs(
+    splittedShaderFunctionCode,
+    shaderFunctionLineNumber
+  );
+  __setSocketData(json, shaderFuncArgs);
+}
+
+function __setShaderFunctionNameAndGetShaderFunctionLineNumber(
+  json: ShaderNodeData,
+  splittedShaderFunctionCode: string[]
+): number {
   for (let i = 0; i < splittedShaderFunctionCode.length; i++) {
     const line = splittedShaderFunctionCode[i];
     const matchedLine = line.match(regVoidFuncStart);
     if (matchedLine != null) {
       json.shaderFunctionName = matchedLine[1].trim();
-      return;
+      return i;
     }
   }
+
+  console.error(
+    'ShaderpackLoader.__setShaderFunctionNameAndGetLineNumberOfShaderFunction: Cannot find a function with return value of void'
+  );
+  throw new Error();
+}
+
+// TODO: ShaderOutputSocket specification is applied in __setParamsFromSGSPcomments
+function __setSocketData(json: ShaderNodeData, shaderFuncArgs: string[]) {
+  const regArg =
+    /^[\t ]*(in|out)[\t ]*(highp|mediump|lowp|)[\t ]+(\w+)[\t ]+(\w+)$/;
+
+  for (let i = 0; i < shaderFuncArgs.length; i++) {
+    const argString = shaderFuncArgs[i];
+
+    const matchArg = argString.match(regArg);
+    const direction = matchArg?.[1].trim() as SocketDirectionEnum;
+    const precision = matchArg?.[2].trim() as ShaderPrecisionType | '';
+    const type = matchArg?.[3].trim() as string;
+    const argName = matchArg?.[4].trim() as string;
+
+    if (matchArg == null || type === '' || argName === '') {
+      console.error(
+        `ShaderpackLoader.__setSocketData: The argument of ${json.shaderFunctionName} is invalid.`
+      );
+      throw new Error();
+    }
+
+    const isAttributeInputSocket = argName.match(/^a_/) != null;
+    if (isAttributeInputSocket) {
+      __setAttributeSocketData(json, argName, direction, type, precision);
+      continue;
+    }
+
+    const isUniformInputSocket = argName.match(/^u_/) != null;
+    if (isUniformInputSocket) {
+      __setUniformSocketData(json, argName, direction, type, precision);
+      continue;
+    }
+
+    const isVaryingSocket = argName.match(/^v_/) != null;
+    if (isVaryingSocket) {
+      __setVaryingSocketData(json, argName, direction, type, precision);
+      continue;
+    }
+
+    __setStandardSocketData(json, argName, direction, type, precision);
+  }
+}
+
+function __getShaderFuncArgs(
+  splittedShaderFunctionCode: string[],
+  lineNumberVoidFunction: number
+) {
+  const regVoidFuncArgument = /^.*\((.*)\).*$/;
+
+  let voidFunc = '';
+  let matchedFuncArgument;
+  for (
+    let i = lineNumberVoidFunction;
+    i < splittedShaderFunctionCode.length;
+    i++
+  ) {
+    voidFunc += splittedShaderFunctionCode[i];
+
+    matchedFuncArgument = voidFunc.match(regVoidFuncArgument);
+    if (matchedFuncArgument != null) {
+      return matchedFuncArgument[1].split(',');
+    }
+  }
+
+  return [];
+}
+
+function __setAttributeSocketData(
+  json: ShaderNodeData,
+  argName: string,
+  direction: 'in' | 'out',
+  type: string,
+  precision: ShaderPrecisionType | ''
+) {
+  const attributeInputSocketData = {
+    socketName: argName,
+    direction: direction as 'in',
+    attributeData: {
+      variableName: argName,
+      type,
+    },
+  } as AttributeInputSocketData;
+
+  if (precision !== '') {
+    attributeInputSocketData.attributeData.precision = precision;
+  }
+
+  json.socketDataArray.push(attributeInputSocketData);
+}
+
+function __setUniformSocketData(
+  json: ShaderNodeData,
+  argName: string,
+  direction: 'in' | 'out',
+  type: string,
+  precision: ShaderPrecisionType | ''
+) {
+  const uniformInputSocketData = {
+    socketName: argName,
+    direction: direction as 'in',
+    uniformData: {
+      variableName: argName,
+      type,
+    },
+  } as UniformInputSocketData;
+
+  if (precision !== '') {
+    uniformInputSocketData.uniformData.precision = precision;
+  }
+
+  json.socketDataArray.push(uniformInputSocketData);
+}
+
+function __setVaryingSocketData(
+  json: ShaderNodeData,
+  argName: string,
+  direction: 'in' | 'out',
+  type: string,
+  precision: ShaderPrecisionType | ''
+) {
+  const varyingSocketData = {
+    socketName: argName,
+    direction: direction,
+    varyingData: {
+      type,
+    },
+  } as VaryingInputSocketData | VaryingOutputSocketData;
+
+  if (direction === 'out' && precision !== '') {
+    const varyingOutputSocketData =
+      varyingSocketData as VaryingOutputSocketData;
+    varyingOutputSocketData.varyingData.precision = precision;
+  }
+
+  json.socketDataArray.push(varyingSocketData);
+}
+
+function __setStandardSocketData(
+  json: ShaderNodeData,
+  argName: string,
+  direction: SocketDirectionEnum,
+  type: string,
+  precision: ShaderPrecisionType | ''
+) {
+  const standardSocketData = {
+    socketName: argName,
+    direction,
+    shaderData: {
+      type,
+    },
+  } as StandardInputSocketData | StandardOutputSocketData;
+
+  if (direction === 'out' && precision !== '') {
+    const standardOutputSocketData =
+      standardSocketData as StandardOutputSocketData;
+    standardOutputSocketData.shaderData.precision = precision;
+  }
+
+  json.socketDataArray.push(standardSocketData);
 }
 
 function __setShaderFunctionCode(
