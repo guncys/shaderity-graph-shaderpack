@@ -351,6 +351,7 @@ function __setParamsFromSGSPcomments(
   __setGUIMode(json, sGSPcomments);
   __setVaryingInterpolation(json, sGSPcomments);
   __convertToShaderOutputSocket(json, sGSPcomments);
+  __setSocketName(json, sGSPcomments);
 }
 
 function __setNodeName(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
@@ -439,6 +440,28 @@ function __convertToShaderOutputSocket(
         throw new Error();
       }
       return;
+    }
+  }
+}
+
+// Methods that uses argument name(e.g. __setVaryingInterpolation) must be executed prior to this method
+function __setSocketName(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
+  const regSocketName = /^SocketName[\t ]*:[\t ]*(.*)$/;
+  const socketNames = __getAllParamsFromSGSPcomment(
+    sGSPcomments,
+    regSocketName
+  );
+
+  for (let i = 0; i < socketNames.length; i++) {
+    const [variableName, socketName] = socketNames[i].split(/[\t ]+/, 2);
+
+    for (let j = 0; j < json.socketDataArray.length; j++) {
+      const socketData = json.socketDataArray[j];
+
+      if (socketData.socketName === variableName) {
+        socketData.socketName = socketName;
+        break;
+      }
     }
   }
 }
