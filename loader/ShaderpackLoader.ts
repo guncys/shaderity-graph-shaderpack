@@ -29,15 +29,9 @@ module.exports = function (source: string) {
   const sGSPcomments: SGSPcomment[] =
     __getCommentsForShaderityGraphShaderPack(splittedOriginalCode);
 
-  console.log('SGSPcomments');
-  console.log(sGSPcomments);
-
   __setParamsFromShaderCode(resultJson, splittedOriginalCode);
   __setParamsFromSGSPcomments(resultJson, sGSPcomments);
   __setGUIOptions(resultJson, splittedOriginalCode);
-
-  console.log('resultJson');
-  console.log(resultJson);
 
   return `export default ${JSON.stringify(resultJson)}`;
 };
