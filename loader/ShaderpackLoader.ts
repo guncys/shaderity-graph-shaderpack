@@ -159,7 +159,6 @@ function __setShaderFunctionNameAndGetShaderFunctionLineNumber(
   throw new Error();
 }
 
-// TODO: ShaderOutputSocket specification is applied in __setParamsFromSGSPcomments
 function __setSocketData(json: ShaderNodeData, shaderFuncArgs: string[]) {
   const regArg =
     /^[\t ]*(in|out)[\t ]*(highp|mediump|lowp|)[\t ]+(\w+)[\t ]+(\w+)$/;
@@ -350,6 +349,7 @@ function __setParamsFromSGSPcomments(
   __setNodeName(json, sGSPcomments);
   __setAvailableShaderStage(json, sGSPcomments);
   __setGUIMode(json, sGSPcomments);
+  __convertToShaderOutputSocket(json, sGSPcomments);
 }
 
 function __setNodeName(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
@@ -373,6 +373,41 @@ function __setGUIMode(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
   const regGUIMode = /^GUIMode[\t ]*:[\t ]*(.*)$/;
   const matchedStr = __getFirstParamFromSGSPcomment(sGSPcomments, regGUIMode);
   json.guiMode = GUIMode.fromString(matchedStr);
+}
+
+// The __setSocketData method must be executed prior to this method
+function __convertToShaderOutputSocket(
+  json: ShaderNodeData,
+  sGSPcomments: SGSPcomment[]
+) {
+  const regShaderOutputSocket = /^ShaderOutputSocket[\t ]*:[\t ]*(.*)$/;
+  const shaderOutputSocketVariableName = __getFirstParamFromSGSPcomment(
+    sGSPcomments,
+    regShaderOutputSocket
+  );
+
+  if (shaderOutputSocketVariableName === '') {
+    return;
+  }
+
+  const sockets = json.socketDataArray;
+  for (let i = 0; i < sockets.length; i++) {
+    const socket = sockets[i];
+    if (socket.socketName === shaderOutputSocketVariableName) {
+      if (socket.direction === 'out') {
+        sockets[i] = {
+          socketName: shaderOutputSocketVariableName,
+          direction: 'out',
+        };
+      } else {
+        console.error(
+          'ShaderpackLoader.__convertToShaderOutputSocket: Cannot convert input socket to shader output socket'
+        );
+        throw new Error();
+      }
+      return;
+    }
+  }
 }
 
 /**
