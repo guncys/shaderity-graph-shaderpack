@@ -411,7 +411,6 @@ function __convertToShaderOutputSocket(
 }
 
 /**
- *
  * @param sGSPcomments array of comments for this loader
  * @param reg Regular expression for the parameter to be extracted.
  *            The format is '/^paramName[\t ]*:[\t ]*(.*)$/'
@@ -430,6 +429,29 @@ function __getFirstParamFromSGSPcomment(
   }
 
   return '';
+}
+
+/**
+ * @param sGSPcomments array of comments for this loader
+ * @param reg Regular expression for the parameter to be extracted.
+ *            The format is '/^paramName[\t ]*:[\t ]*(.*)$/'
+ */
+function __getAllParamsFromSGSPcomment(
+  sGSPcomments: SGSPcomment[],
+  reg: RegExp
+): string[] {
+  const sGSPParams: string[] = [];
+
+  for (let i = 0; i < sGSPcomments.length; i++) {
+    const sGSPcontent = sGSPcomments[i].content;
+
+    const matchedParam = sGSPcontent.match(reg);
+    if (matchedParam != null) {
+      sGSPParams.push(matchedParam[1].trim());
+    }
+  }
+
+  return sGSPParams;
 }
 
 // The __setGUIMode method must be executed prior to this method
