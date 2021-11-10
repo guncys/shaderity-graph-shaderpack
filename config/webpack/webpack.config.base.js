@@ -6,7 +6,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(glsl|vs|fs|vert|frag)$/,
+        test: /\.glsl$/,
         exclude: /node_modules/,
         use: [
           {
