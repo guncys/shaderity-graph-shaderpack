@@ -349,6 +349,7 @@ function __setParamsFromSGSPcomments(
   __setNodeName(json, sGSPcomments);
   __setAvailableShaderStage(json, sGSPcomments);
   __setGUIMode(json, sGSPcomments);
+  __setVaryingInterpolation(json, sGSPcomments);
   __convertToShaderOutputSocket(json, sGSPcomments);
 }
 
@@ -373,6 +374,38 @@ function __setGUIMode(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
   const regGUIMode = /^GUIMode[\t ]*:[\t ]*(.*)$/;
   const matchedStr = __getFirstParamFromSGSPcomment(sGSPcomments, regGUIMode);
   json.guiMode = GUIMode.fromString(matchedStr);
+}
+
+function __setVaryingInterpolation(
+  json: ShaderNodeData,
+  sGSPcomments: SGSPcomment[]
+) {
+  const regVaryingInterpolation = /^VaryingInterpolation[\t ]*:[\t ]*(.*)$/;
+  const interpolations = __getAllParamsFromSGSPcomment(
+    sGSPcomments,
+    regVaryingInterpolation
+  );
+
+  for (let i = 0; i < interpolations.length; i++) {
+    const [variableName, interpolationType] = interpolations[i].split(
+      /[\t ]+/,
+      2
+    );
+
+    for (let j = 0; j < json.socketDataArray.length; j++) {
+      const socketData = json.socketDataArray[j] as VaryingOutputSocketData;
+      if (socketData.direction !== 'out' || socketData.varyingData == null) {
+        continue;
+      }
+
+      if (socketData.socketName === variableName) {
+        socketData.varyingData.interpolationType = interpolationType as
+          | 'flat'
+          | 'smooth';
+        break;
+      }
+    }
+  }
 }
 
 // The __setSocketData method must be executed prior to this method
