@@ -8,7 +8,6 @@ module.exports = function (source: string) {
   const resultJson: ShaderNodeData = {
     shaderFunctionName: '',
     shaderFunctionCode: '',
-    extensions: [],
     socketDataArray: [],
     nodeName: '',
     availableShaderStage: AvailableShaderStage.Unknown,
@@ -119,11 +118,16 @@ function __setShaderFunctionCode(
 }
 
 function __setExtension(json: ShaderNodeData, splittedOriginalCode: string[]) {
+  if (splittedOriginalCode.length === 0) {
+    return;
+  }
+
   for (let i = 0; i < splittedOriginalCode.length; i++) {
     const matchedLine = splittedOriginalCode[i].match(regExtension);
 
     if (matchedLine != null) {
       const extensionName = matchedLine[1].trim();
+      json.extensions = json.extensions ?? [];
       json.extensions.push(extensionName);
     }
   }

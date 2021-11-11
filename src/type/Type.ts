@@ -6,7 +6,7 @@ export type SocketData = _SocketData;
 export interface ShaderNodeData {
   shaderFunctionName: string;
   shaderFunctionCode: string;
-  extensions: Array<string>;
+  extensions?: Array<string>;
   socketDataArray: Array<SocketData>;
 
   // defined by comments in a shader function code file
