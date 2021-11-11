@@ -363,12 +363,22 @@ function __setAvailableShaderStage(
     regAvailableShaderStage
   );
   json.availableShaderStage = AvailableShaderStage.fromString(matchedStr);
+
+  // default value
+  if (json.availableShaderStage === AvailableShaderStage.Unknown) {
+    json.availableShaderStage = AvailableShaderStage.VertexAndFragment;
+  }
 }
 
 function __setGUIMode(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
   const regGUIMode = /^GUIMode[\t ]*:[\t ]*(.*)$/;
   const matchedStr = __getFirstParamFromSGSPcomment(sGSPcomments, regGUIMode);
   json.guiMode = GUIMode.fromString(matchedStr);
+
+  // default value
+  if (json.guiMode === GUIMode.Unknown) {
+    json.guiMode = GUIMode.Standard;
+  }
 }
 
 function __setVaryingInterpolation(
