@@ -44,14 +44,26 @@ const regSGSP = /^[\t ]*\/\/[\t ]*<[\t ]*SGSP[\t ]*>(.*)$/;
 const regExtension = /^[\t ]*#[\t ]*extension[\t ]*(.*):.*$/;
 const regVoidFuncStart = /^[\t ]*void[\t ]*(\w+)\(/;
 
+/**
+ * @private
+ * Split a string into an array by line feeds
+ */
 function __splitByLineFeedCode(str: string) {
   return str.split(/\r\n|\n/);
 }
 
+/**
+ * @private
+ * Join strings with a linefeed character in between
+ */
 function __joinSplittedLine(splittedLine: string[]) {
   return splittedLine.join('\n');
 }
 
+/**
+ * @private
+ * Extract comments beginning with "// <SGSP>"
+ */
 function __getCommentsForShaderityGraphShaderPack(
   shaderCodeLines: string[]
 ): SGSPcomment[] {
@@ -72,6 +84,12 @@ function __getCommentsForShaderityGraphShaderPack(
   return sGSPcomments;
 }
 
+/**
+ * @private
+ * Set parameters to the ShaderNodeData json from the shader code except for the comments.
+ * @param json The object of the json output by this loader
+ * @param splittedOriginalCode The shader code written in the glsl file
+ */
 function __setParamsFromShaderCode(
   json: ShaderNodeData,
   splittedOriginalCode: string[]
@@ -85,9 +103,10 @@ function __setParamsFromShaderCode(
 }
 
 /**
+ * @private
  * Create a splitted shader function code by removing unnecessary
  * lines from the original splitted code.
- * The splitted shader function code does not need the following:
+ * The lines to be deleted satisfies one of the following conditions
  * 1. comment for this library ('// <SGSP>~')
  * 2. global precision (This may be necessary to enable the use of Linter in the fragment shader)
  * 3. extension
@@ -117,6 +136,10 @@ function __createSplittedShaderFunctionCode(splittedOriginalCode: string[]) {
   return splittedShaderCode;
 }
 
+/**
+ * @private
+ * Set the function name and the socket data to ShaderNodeData json.
+ */
 function __setShaderFunctionNameAndSocketData(
   json: ShaderNodeData,
   splittedShaderFunctionCode: string[]
@@ -131,9 +154,16 @@ function __setShaderFunctionNameAndSocketData(
     splittedShaderFunctionCode,
     shaderFunctionLineNumber
   );
+
+  // TODO: support overload of the entry shader function
   __setSocketData(json, shaderFuncArgs);
 }
 
+/**
+ * @private
+ * Detect the entry shader function of this node and set the function name to ShaderNodeData json.
+ * The entry shader function is the first function with a return value of void.
+ */
 function __setShaderFunctionNameAndGetShaderFunctionLineNumber(
   json: ShaderNodeData,
   splittedShaderFunctionCode: string[]
@@ -153,6 +183,18 @@ function __setShaderFunctionNameAndGetShaderFunctionLineNumber(
   throw new Error();
 }
 
+/**
+ * @private
+ * Set the socketData corresponding to the argument of
+ * the shader function to ShaderNodeData json.
+ * If the argument variable name begins with 'a_', 'v_', or 'u_',
+ * it becomes the input/output socket for attribute, varying,
+ * or uniform variables, respectively.
+ *
+ * Note: ShaderOutputSocket is not created by this method.
+ *       Call the __convertToShaderOutputSocket method after calling
+ *       this method to replace the corresponding socket with a ShaderOutputSocket.
+ */
 function __setSocketData(json: ShaderNodeData, shaderFuncArgs: string[]) {
   const regArg =
     /^[\t ]*(in|out)[\t ]*(highp|mediump|lowp|)[\t ]+(\w+)[\t ]+(\w+)$/;
@@ -195,6 +237,10 @@ function __setSocketData(json: ShaderNodeData, shaderFuncArgs: string[]) {
   }
 }
 
+/**
+ * @private
+ * Get the argument of the first function in the line after lineNumberVoidFunction.
+ */
 function __getShaderFuncArgs(
   splittedShaderFunctionCode: string[],
   lineNumberVoidFunction: number
@@ -219,6 +265,10 @@ function __getShaderFuncArgs(
   return [];
 }
 
+/**
+ * @private
+ * Set attribute input socket data to ShaderNodeData json.
+ */
 function __setAttributeSocketData(
   json: ShaderNodeData,
   argName: string,
@@ -242,6 +292,10 @@ function __setAttributeSocketData(
   json.socketDataArray.push(attributeInputSocketData);
 }
 
+/**
+ * @private
+ * Set uniform input socket data to ShaderNodeData json.
+ */
 function __setUniformSocketData(
   json: ShaderNodeData,
   argName: string,
@@ -265,6 +319,10 @@ function __setUniformSocketData(
   json.socketDataArray.push(uniformInputSocketData);
 }
 
+/**
+ * @private
+ * Set varying input/output socket data to ShaderNodeData json.
+ */
 function __setVaryingSocketData(
   json: ShaderNodeData,
   argName: string,
@@ -289,6 +347,10 @@ function __setVaryingSocketData(
   json.socketDataArray.push(varyingSocketData);
 }
 
+/**
+ * @private
+ * Set standard input/output socket data to ShaderNodeData json.
+ */
 function __setStandardSocketData(
   json: ShaderNodeData,
   argName: string,
@@ -313,6 +375,13 @@ function __setStandardSocketData(
   json.socketDataArray.push(standardSocketData);
 }
 
+/**
+ * @private
+ * Set shaderFunctionCode to ShaderNodeData json.
+ *
+ * To eliminate unnecessary data, the splittedShaderFunctionCode is
+ * filled with the result of the __createSplittedShaderFunctionCode method.
+ */
 function __setShaderFunctionCode(
   json: ShaderNodeData,
   splittedShaderFunctionCode: string[]
@@ -320,6 +389,10 @@ function __setShaderFunctionCode(
   json.shaderFunctionCode = __joinSplittedLine(splittedShaderFunctionCode);
 }
 
+/**
+ * @private
+ * Set required shader extension in the shader function to ShaderNodeData json.
+ */
 function __setExtension(json: ShaderNodeData, splittedOriginalCode: string[]) {
   if (splittedOriginalCode.length === 0) {
     return;
@@ -336,6 +409,12 @@ function __setExtension(json: ShaderNodeData, splittedOriginalCode: string[]) {
   }
 }
 
+/**
+ * @private
+ * Set parameters to the ShaderNodeData json from specified format comment
+ * @param json The object of the json output by this loader
+ * @param sGSPcomments comments beginning with "// <SGSP>"
+ */
 function __setParamsFromSGSPcomments(
   json: ShaderNodeData,
   sGSPcomments: SGSPcomment[]
@@ -349,11 +428,31 @@ function __setParamsFromSGSPcomments(
   __setSocketName(json, sGSPcomments);
 }
 
+/**
+ * @private
+ * Set node name to ShaderNodeData json.
+ *
+ * You can specify the node name by writing the following comment somewhere in the glsl file:
+ * // <SGSP> NodeName: sample node name
+ *
+ * In the above case, the node name is 'sample node name'.
+ */
 function __setNodeName(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
   const regNodeName = /^NodeName[\t ]*:[\t ]*(.*)$/;
   json.nodeName = __getFirstParamFromSGSPcomment(sGSPcomments, regNodeName);
 }
 
+/**
+ * @private
+ * Set available shader stage to ShaderNodeData json.
+ *
+ * You can specify the available shader stage by writing the following comment
+ * somewhere in the glsl file:
+ * // <SGSP> AvailableShaderStage: Vertex
+ *
+ * The allowed values are 'Vertex', 'Fragment', and 'VertexAndFragment'.
+ * The default value is 'VertexAndFragment'.
+ */
 function __setAvailableShaderStage(
   json: ShaderNodeData,
   sGSPcomments: SGSPcomment[]
@@ -371,6 +470,17 @@ function __setAvailableShaderStage(
   }
 }
 
+/**
+ * @private
+ * Set gui mode to ShaderNodeData json.
+ *
+ * You can specify the gui mode by writing the following comment
+ * somewhere in the glsl file:
+ * // <SGSP> GUIMode: Standard
+ *
+ * The allowed values are 'Standard', 'PullDown', 'SetVector', 'SetMatrix' and 'SetTexture'.
+ * The default value is 'Standard'.
+ */
 function __setGUIMode(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
   const regGUIMode = /^GUIMode[\t ]*:[\t ]*(.*)$/;
   const matchedStr = __getFirstParamFromSGSPcomment(sGSPcomments, regGUIMode);
@@ -382,6 +492,20 @@ function __setGUIMode(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
   }
 }
 
+/**
+ * @private
+ * Set varying interpolation type to varying output socket.
+ *
+ * You can specify the varying interpolation type by writing the following comment
+ * somewhere in the glsl file:
+ * // <SGSP> VaryingInterpolation: v_variableName flat
+ *
+ * In the above case, the interpolation type of the varying output socket
+ * corresponding to the argument of the shader function whose variable name
+ * is 'v_variableName' is set to 'flat'.
+ *
+ * The valid interpolation type values are 'flat'and 'smooth'.
+ */
 function __setVaryingInterpolation(
   json: ShaderNodeData,
   sGSPcomments: SGSPcomment[]
@@ -414,7 +538,19 @@ function __setVaryingInterpolation(
   }
 }
 
-// The __setSocketData method must be executed prior to this method
+/**
+ * @private
+ * Convert a socketData to shader output socket.
+ * The __setSocketData method must be called prior to this method.
+ *
+ * You can convert a socket to shader output socket by writing
+ * the following comment somewhere in the glsl file:
+ * // <SGSP> ShaderOutputSocket: outVec4
+ *
+ * In the above case, the socket corresponding to the argument of
+ * the shader function whose variable name is 'outVec4' is converted
+ * to the shader output socket.
+ */
 function __convertToShaderOutputSocket(
   json: ShaderNodeData,
   sGSPcomments: SGSPcomment[]
@@ -449,6 +585,11 @@ function __convertToShaderOutputSocket(
   }
 }
 
+/**
+ * @private
+ * Remove variable name property from uniform input socket data
+ * not to share the uniform variable.
+ */
 function __removeNonSharingUniformVariableName(
   json: ShaderNodeData,
   sGSPcomments: SGSPcomment[]
@@ -475,7 +616,18 @@ function __removeNonSharingUniformVariableName(
   }
 }
 
-// Methods that uses argument name(e.g. __setVaryingInterpolation) must be executed prior to this method
+/**
+ * @private
+ * set a socket name to corresponding shader socket data.
+ * Methods that uses argument name of shader function(e.g. __setVaryingInterpolation)
+ * must be called prior to this method.
+ *
+ * You can set a socket name by writing the following comment somewhere in the glsl file:
+ * // <SGSP> SocketName: outVec4 vector4
+ *
+ * In the above case, the name of the socket corresponding to the argument of
+ * the shader function whose variable name is 'outVec4' is set to 'vector4'
+ */
 function __setSocketName(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
   const regSocketName = /^SocketName[\t ]*:[\t ]*(.*)$/;
   const socketNames = __getAllParamsFromSGSPcomment(
@@ -498,7 +650,11 @@ function __setSocketName(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
 }
 
 /**
- * @param sGSPcomments array of comments for this loader
+ * Extract the value of the parameter from the comment for this loader,
+ * starting with '// <SGSP>'.
+ * Return the value of the first matched line.
+ * @param sGSPcomments Array of comments for this loader.
+ *                     Note that '// <SGSP>' is already removed.
  * @param reg Regular expression for the parameter to be extracted.
  *            The format is '/^paramName[\t ]*:[\t ]*(.*)$/'
  */
@@ -519,6 +675,9 @@ function __getFirstParamFromSGSPcomment(
 }
 
 /**
+ * Extract the values of the parameter from the comment for this loader,
+ * starting with '// <SGSP>'.
+ * Return the values of the all matched lines.
  * @param sGSPcomments array of comments for this loader
  * @param reg Regular expression for the parameter to be extracted.
  *            The format is '/^paramName[\t ]*:[\t ]*(.*)$/'
@@ -541,13 +700,28 @@ function __getAllParamsFromSGSPcomment(
   return sGSPParams;
 }
 
-// The __setGUIMode method must be executed prior to this method
+/**
+ * @private
+ * Set GUIOption parameters to the ShaderNodeData json
+ * The __setGUIMode method must be called prior to this method
+ */
 function __setGUIOptions(json: ShaderNodeData, splittedOriginalCode: string[]) {
   if (json.guiMode === GUIMode.PullDown) {
     __setGUIPullDownOptions(json, splittedOriginalCode);
   }
 }
 
+/**
+ * @private
+ * Set GUIOption parameters for pull down mode to the ShaderNodeData json.
+ * You can set two options 'PullDown_Description' and 'PullDown_DisplayName'.
+ *
+ * To set 'PullDown_Description', write the following comment somewhere in the glsl file:
+ * // <SGSP> PullDown_Description: position mode
+ *
+ * To set 'PullDown_DisplayName', write the following comment
+ * directly above the corresponding shader function with a void return value.
+ */
 function __setGUIPullDownOptions(
   json: ShaderNodeData,
   splittedOriginalCode: string[]
