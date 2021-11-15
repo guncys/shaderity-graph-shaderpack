@@ -345,6 +345,7 @@ function __setParamsFromSGSPcomments(
   __setGUIMode(json, sGSPcomments);
   __setVaryingInterpolation(json, sGSPcomments);
   __convertToShaderOutputSocket(json, sGSPcomments);
+  __removeNonSharingUniformVariableName(json, sGSPcomments);
   __setSocketName(json, sGSPcomments);
 }
 
@@ -444,6 +445,32 @@ function __convertToShaderOutputSocket(
         throw new Error();
       }
       return;
+    }
+  }
+}
+
+function __removeNonSharingUniformVariableName(
+  json: ShaderNodeData,
+  sGSPcomments: SGSPcomment[]
+) {
+  const regSharingUniformVariable = /^SharingUniformVariable[\t ]*:[\t ]*(.*)$/;
+  const sharingUniformVariable = __getFirstParamFromSGSPcomment(
+    sGSPcomments,
+    regSharingUniformVariable
+  ).trim();
+
+  const sharingUniformVariableNames = sharingUniformVariable.split(/[\t ]+/);
+
+  for (const socketData of json.socketDataArray) {
+    const uniformSocketData = socketData as UniformInputSocketData;
+    if (uniformSocketData.uniformData != null) {
+      const isSharingName = sharingUniformVariableNames.some(
+        name => name === uniformSocketData.uniformData.variableName
+      );
+
+      if (!isSharingName) {
+        delete uniformSocketData.uniformData.variableName;
+      }
     }
   }
 }

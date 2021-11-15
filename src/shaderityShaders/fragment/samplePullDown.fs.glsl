@@ -1,7 +1,7 @@
 // <SGSP> NodeName: PullDown GUI Sample
 // <SGSP> AvailableShaderStage: Fragment
 // <SGSP> GUIMode: PullDown
-// <SGSP> UniqueUniformVariable: u_uniformMat4
+// <SGSP> SharingUniformVariable: u_uniformMat4
 
 // Note: The global precision specification will be removed in shader pack loader.
 //       This specification may be necessary to avoid errors when using the Linter for GLSL fragment shaders.
