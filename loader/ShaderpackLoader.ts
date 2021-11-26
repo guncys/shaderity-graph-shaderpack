@@ -4,6 +4,7 @@ import {
   PullDownItem,
   ShaderNodeData,
   ShaderPrecisionType,
+  SocketData,
   SocketDirectionEnum,
   StandardInputSocketData,
   StandardOutputSocketData,
@@ -11,7 +12,12 @@ import {
   VaryingInputSocketData,
   VaryingOutputSocketData,
 } from './../src/type/Type';
-import {AvailableShaderStage, GUIMode} from '../src/type/Enum';
+import {
+  AvailableShaderStage,
+  AvailableShaderStageEnum,
+  GUIMode,
+} from '../src/type/Enum';
+import SG from 'shaderity-graph';
 
 module.exports = function (source: string) {
   (this as CustomNodeModule).cacheable();
@@ -464,9 +470,50 @@ function __setAvailableShaderStage(
   );
   json.availableShaderStage = AvailableShaderStage.fromString(matchedStr);
 
+  __checkSetCorrectAvailableShaderStage(
+    json.availableShaderStage,
+    json.socketDataArray
+  );
+
   // default value
   if (json.availableShaderStage === AvailableShaderStage.Unknown) {
     json.availableShaderStage = AvailableShaderStage.VertexAndFragment;
+  }
+}
+
+/**
+ * @private
+ * Verify that there are no unusable sockets on the node.
+ * The attribute input socket and varying output socket cannot be used
+ * in the fragment shader.
+ */
+function __checkSetCorrectAvailableShaderStage(
+  availableShaderStage: AvailableShaderStageEnum,
+  socketDataArray: SocketData[]
+) {
+  if (availableShaderStage !== AvailableShaderStage.Vertex) {
+    for (const socketData of socketDataArray) {
+      const vSocketData = socketData as
+        | VaryingInputSocketData
+        | VaryingOutputSocketData;
+      if (
+        vSocketData.varyingData != null &&
+        vSocketData.direction === SG.SocketDirection.Output
+      ) {
+        console.error(
+          'ShaderpackLoader.__checkSetCorrectAvailableShaderStage: VaryingOutputSocket can be set to vertex shader only'
+        );
+        throw new Error();
+      }
+
+      const aSocketData = socketData as AttributeInputSocketData;
+      if (aSocketData.attributeData != null) {
+        console.error(
+          'ShaderpackLoader.__checkSetCorrectAvailableShaderStage: AttributeInputSocket can be set to vertex shader only'
+        );
+        throw new Error();
+      }
+    }
   }
 }
 
