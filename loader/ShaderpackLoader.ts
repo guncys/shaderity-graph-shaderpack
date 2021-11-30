@@ -39,6 +39,8 @@ module.exports = function (source: string) {
   __setParamsFromSGSPcomments(resultJson, sGSPcomments);
   __setGUIOptions(resultJson, splittedOriginalCode);
 
+  __changeSocketName(resultJson, sGSPcomments);
+
   return `export default ${JSON.stringify(resultJson)}`;
 };
 
@@ -431,7 +433,6 @@ function __setParamsFromSGSPcomments(
   __setVaryingInterpolation(json, sGSPcomments);
   __convertToShaderOutputSocket(json, sGSPcomments);
   __removeNonSharingUniformVariableName(json, sGSPcomments);
-  __setSocketName(json, sGSPcomments);
 }
 
 /**
@@ -664,39 +665,6 @@ function __removeNonSharingUniformVariableName(
 }
 
 /**
- * @private
- * set a socket name to corresponding shader socket data.
- * Methods that uses argument name of shader function(e.g. __setVaryingInterpolation)
- * must be called prior to this method.
- *
- * You can set a socket name by writing the following comment somewhere in the glsl file:
- * // <SGSP> SocketName: outVec4 vector4
- *
- * In the above case, the name of the socket corresponding to the argument of
- * the shader function whose variable name is 'outVec4' is set to 'vector4'
- */
-function __setSocketName(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
-  const regSocketName = /^SocketName[\t ]*:[\t ]*(.*)$/;
-  const socketNames = __getAllParamsFromSGSPcomment(
-    sGSPcomments,
-    regSocketName
-  );
-
-  for (let i = 0; i < socketNames.length; i++) {
-    const [variableName, socketName] = socketNames[i].split(/[\t ]+/, 2);
-
-    for (let j = 0; j < json.socketDataArray.length; j++) {
-      const socketData = json.socketDataArray[j];
-
-      if (socketData.socketName === variableName) {
-        socketData.socketName = socketName;
-        break;
-      }
-    }
-  }
-}
-
-/**
  * Extract the value of the parameter from the comment for this loader,
  * starting with '// <SGSP>'.
  * Return the value of the first matched line.
@@ -813,6 +781,43 @@ function __setGUIPullDownOptions(
         displayName = undefined;
       }
       json.guiOptions.pullDown.items.push(item);
+    }
+  }
+}
+
+/**
+ * @private
+ * Changes the socket name from the argument name of the shader function to the specified value.
+ *
+ * When reading options for a specific socket in the loader,
+ * specify all of them by the name of the argument of the shader function.
+ * This method should be called at the end of the loader to change the name
+ * of the shader function argument, since it will be used for loading other options.
+ *
+ * You can set a socket name by writing the following comment somewhere in the glsl file:
+ * // <SGSP> SocketName: outVec4 vector4
+ *
+ * In the above case, the name of the socket corresponding to the argument of
+ * the shader function whose variable name is 'outVec4' is set to 'vector4'
+ */
+
+function __changeSocketName(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
+  const regSocketName = /^SocketName[\t ]*:[\t ]*(.*)$/;
+  const socketNames = __getAllParamsFromSGSPcomment(
+    sGSPcomments,
+    regSocketName
+  );
+
+  for (let i = 0; i < socketNames.length; i++) {
+    const [variableName, socketName] = socketNames[i].split(/[\t ]+/, 2);
+
+    for (let j = 0; j < json.socketDataArray.length; j++) {
+      const socketData = json.socketDataArray[j];
+
+      if (socketData.socketName === variableName) {
+        socketData.socketName = socketName;
+        break;
+      }
     }
   }
 }
