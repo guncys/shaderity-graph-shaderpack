@@ -37,7 +37,7 @@ module.exports = function (source: string) {
 
   __setParamsFromShaderCode(resultJson, splittedOriginalCode);
   __setParamsFromSGSPcomments(resultJson, sGSPcomments);
-  __setGUIOptions(resultJson, splittedOriginalCode);
+  __setGUIOptions(resultJson, splittedOriginalCode, sGSPcomments);
 
   __changeSocketName(resultJson, sGSPcomments);
 
@@ -720,9 +720,15 @@ function __getAllParamsFromSGSPcomment(
  * Set GUIOption parameters to the ShaderNodeData json
  * The __setGUIMode method must be called prior to this method
  */
-function __setGUIOptions(json: ShaderNodeData, splittedOriginalCode: string[]) {
+function __setGUIOptions(
+  json: ShaderNodeData,
+  splittedOriginalCode: string[],
+  sGSPcomments: SGSPcomment[]
+) {
   if (json.guiMode === GUIMode.PullDown) {
     __setGUIPullDownOptions(json, splittedOriginalCode);
+  } else if (json.guiMode === GUIMode.SetVector) {
+    __setGUISetVectorOptions(json, sGSPcomments);
   }
 }
 
@@ -787,12 +793,64 @@ function __setGUIPullDownOptions(
 
 /**
  * @private
+ */
+function __setGUISetVectorOptions(
+  json: ShaderNodeData,
+  sGSPcomments: SGSPcomment[]
+) {
+  const regSetVectorDescriptions = /^SetVector_Descriptions[\t ]*:[\t ]*(.*)$/;
+  const regSetVectorDefaultValues =
+    /^SetVector_DefaultValues[\t ]*:[\t ]*(.*)$/;
+
+  const matchedDescriptionsArray = __getAllParamsFromSGSPcomment(
+    sGSPcomments,
+    regSetVectorDescriptions
+  );
+  const matchedDefaultValuesArray = __getAllParamsFromSGSPcomment(
+    sGSPcomments,
+    regSetVectorDefaultValues
+  );
+
+  if (
+    matchedDescriptionsArray.length === 0 &&
+    matchedDefaultValuesArray.length === 0
+  ) {
+    return;
+  }
+
+  json.guiOptions = json.guiOptions ?? {};
+  json.guiOptions.setVector = {};
+
+  for (let i = 0; i < matchedDescriptionsArray.length; i++) {
+    const matchedDescriptions = matchedDescriptionsArray[i];
+    const params = matchedDescriptions.split(/[\t ]+/);
+    const socketName = params.shift() as string;
+    const descriptions = params;
+
+    json.guiOptions.setVector[socketName] = {
+      descriptions,
+    };
+  }
+
+  for (let i = 0; i < matchedDefaultValuesArray.length; i++) {
+    const matchedDefaultValues = matchedDefaultValuesArray[i];
+    const params = matchedDefaultValues.split(/[\t ]+/);
+    const socketName = params.shift() as string;
+    const defaultValues = params.map(str => Number(str));
+    json.guiOptions.setVector[socketName] =
+      json.guiOptions.setVector[socketName] ?? {};
+    json.guiOptions.setVector[socketName].defaultValues = defaultValues;
+  }
+}
+
+/**
+ * @private
  * Changes the socket name from the argument name of the shader function to the specified value.
+ * However, the name of the uniform input socket cannot be changed
+ * because it is used when the GUIMode is setVector.
  *
- * When reading options for a specific socket in the loader,
- * specify all of them by the name of the argument of the shader function.
- * This method should be called at the end of the loader to change the name
- * of the shader function argument, since it will be used for loading other options.
+ * This method should be called at the end of the loader,
+ * since the argument of the shader function will be used for other options.
  *
  * You can set a socket name by writing the following comment somewhere in the glsl file:
  * // <SGSP> SocketName: outVec4 vector4
@@ -810,6 +868,11 @@ function __changeSocketName(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
 
   for (let i = 0; i < socketNames.length; i++) {
     const [variableName, socketName] = socketNames[i].split(/[\t ]+/, 2);
+
+    const isUniformVariable = variableName.match(/^u_/) != null;
+    if (isUniformVariable) {
+      continue;
+    }
 
     for (let j = 0; j < json.socketDataArray.length; j++) {
       const socketData = json.socketDataArray[j];
