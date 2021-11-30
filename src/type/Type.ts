@@ -41,5 +41,11 @@ export interface ShaderNodeData {
       description: string;
       items: PullDownItem[];
     };
+    setVector?: {
+      [uniformVariableName: string]: {
+        descriptions?: string[];
+        defaultValues?: number[];
+      };
+    };
   };
 }
