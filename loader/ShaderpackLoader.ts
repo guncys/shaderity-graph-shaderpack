@@ -740,8 +740,11 @@ function __setGUIOptions(
  * To set 'PullDown_Description', write the following comment somewhere in the glsl file:
  * // <SGSP> PullDown_Description: position mode
  *
- * To set 'PullDown_DisplayName', write the following comment
+ * To set 'PullDown_DisplayName', write the comment
  * directly above the corresponding shader function with a void return value.
+ * The following is the example:
+ * // <SGSP> PullDown_DisplayName: view
+ * void inputPosition_view(
  */
 function __setGUIPullDownOptions(
   json: ShaderNodeData,
@@ -793,6 +796,14 @@ function __setGUIPullDownOptions(
 
 /**
  * @private
+ * Set GUIOption parameters for set vector mode to the ShaderNodeData json.
+ * You can set two options 'SetVector_Descriptions' and 'SetVector_DefaultValues'.
+ *
+ * To set 'SetVector_Descriptions', write the following comment somewhere in the glsl file:
+ * // <SGSP> SetVector_Descriptions: u_uniformSocketName r g b a
+ *
+ * To set 'SetVector_DefaultValues', write the following comment somewhere in the glsl file:
+ * // <SGSP> SetVector_DefaultValues: u_uniformSocketName 1 1 1 1
  */
 function __setGUISetVectorOptions(
   json: ShaderNodeData,
