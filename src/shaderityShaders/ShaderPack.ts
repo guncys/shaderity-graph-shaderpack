@@ -4,6 +4,7 @@ import fragmentColor from './fragment/fragmentColor.fs.glsl';
 import inputPosition from './vertex/inputPosition.vs.glsl';
 import vertexPosition from './vertex/vertexPosition.vs.glsl';
 import uniformColor from './common/uniformColor.glsl';
+import uniformTexture2D from './common/uniformTexture2D.glsl';
 
 export const ShaderPack: ShaderNodeData[] = [
   uniformVector4,
@@ -11,4 +12,5 @@ export const ShaderPack: ShaderNodeData[] = [
   inputPosition,
   vertexPosition,
   uniformColor,
+  uniformTexture2D,
 ];
