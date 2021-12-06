@@ -2,12 +2,13 @@
   "cSpell.words": [
     "cacheable",
     "glsl",
-    "setvector",
     "setmatrix",
     "settexture",
+    "setvector",
     "SGSP",
     "Shaderpack",
+    "texcoord",
     "uniformvalue",
-    "vertexandfragment",
+    "vertexandfragment"
   ]
 }
