@@ -759,6 +759,8 @@ function __setGUIPullDownOptions(
   const regPullDownDescription = /^PullDown_Description[\t ]*:[\t ]*(.*)$/;
   const regPullDownDisplayName = /^PullDown_DisplayName[\t ]*:[\t ]*(.*)$/;
 
+  const functionNames: string[] = [];
+
   let displayName: string | undefined;
   for (let i = 0; i < splittedOriginalCode.length; i++) {
     const line = splittedOriginalCode[i];
@@ -783,6 +785,16 @@ function __setGUIPullDownOptions(
     const matchedLineVoidFunc = line.match(regVoidFuncStart);
     if (matchedLineVoidFunc != null) {
       const functionName = matchedLineVoidFunc[1].trim();
+      const duplicateFunctionName = functionNames.some(
+        name => name === functionName
+      );
+
+      if (duplicateFunctionName) {
+        throw new Error(
+          'ShaderpackLoader.__setGUIPullDownOptions: found duplicate function name'
+        );
+      }
+      functionNames.push(functionName);
 
       const item: PullDownItem = {functionName};
       if (displayName != null) {
