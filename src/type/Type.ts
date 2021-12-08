@@ -40,10 +40,7 @@ export interface SetVectorOption {
   [uniformVariableName: string]: VectorOption;
 }
 
-export interface ShaderityNodeData {
-  shaderFunctionName: string;
-  shaderFunctionCode: string;
-  extensions?: Array<string>;
+export interface AbstractNodeData {
   socketDataArray: Array<SocketData>;
 
   // defined by comments in a shader function code file
@@ -54,4 +51,10 @@ export interface ShaderityNodeData {
     pullDown?: PullDownOption;
     setVector?: SetVectorOption;
   };
+}
+
+export interface ShaderityNodeData extends AbstractNodeData {
+  shaderFunctionName: string;
+  shaderFunctionCode: string;
+  extensions?: Array<string>;
 }
