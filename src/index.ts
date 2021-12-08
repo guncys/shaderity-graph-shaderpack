@@ -5,7 +5,7 @@ import {
   AvailableShaderStageEnum,
 } from './type/Enum';
 import {
-  ShaderNodeData,
+  ShaderityNodeData,
   PullDownItem,
   PullDownOption,
   VectorOption,
@@ -22,7 +22,7 @@ export default {
 export type {
   GUIModeEnum,
   AvailableShaderStageEnum,
-  ShaderNodeData,
+  ShaderityNodeData,
   PullDownItem,
   PullDownOption,
   VectorOption,

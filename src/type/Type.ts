@@ -40,7 +40,7 @@ export interface SetVectorOption {
   [uniformVariableName: string]: VectorOption;
 }
 
-export interface ShaderNodeData {
+export interface ShaderityNodeData {
   shaderFunctionName: string;
   shaderFunctionCode: string;
   extensions?: Array<string>;
