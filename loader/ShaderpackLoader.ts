@@ -223,6 +223,12 @@ function __setSocketData(json: ShaderityNodeData, shaderFuncArgs: string[]) {
       throw new Error();
     }
 
+    const isSamplerInputSocket = type.match(/sampler/) != null;
+    if (isSamplerInputSocket) {
+      __setSamplerInputSocketData(json, argName, direction, type);
+      continue;
+    }
+
     const isAttributeInputSocket = argName.match(/^a_/) != null;
     if (isAttributeInputSocket) {
       __setAttributeSocketData(json, argName, direction, type, precision);
@@ -275,12 +281,38 @@ function __getShaderFuncArgs(
 
 /**
  * @private
+ * Get the argument of the first function in the line after lineNumberVoidFunction.
+ */
+function __setSamplerInputSocketData(
+  json: ShaderityNodeData,
+  argName: string,
+  direction: SocketDirectionEnum,
+  samplerType: string
+) {
+
+  if (direction === SG.SocketDirection.Output) {
+    throw new Error(
+      'ShaderPackLoader.__setSamplerInputSocketData: This loader does not support sampler output socket'
+    );
+  }
+
+  const samplerInputSocketData = {
+    socketName: argName,
+    direction,
+    samplerType: samplerType as 'sampler2D' | 'samplerCube',
+  };
+
+  json.socketDataArray.push(samplerInputSocketData);
+}
+
+/**
+ * @private
  * Set attribute input socket data to ShaderNodeData json.
  */
 function __setAttributeSocketData(
   json: ShaderityNodeData,
   argName: string,
-  direction: 'in' | 'out',
+  direction: SocketDirectionEnum,
   type: string,
   precision: ShaderPrecisionType | ''
 ) {
@@ -307,7 +339,7 @@ function __setAttributeSocketData(
 function __setUniformSocketData(
   json: ShaderityNodeData,
   argName: string,
-  direction: 'in' | 'out',
+  direction: SocketDirectionEnum,
   type: string,
   precision: ShaderPrecisionType | ''
 ) {
@@ -334,7 +366,7 @@ function __setUniformSocketData(
 function __setVaryingSocketData(
   json: ShaderityNodeData,
   argName: string,
-  direction: 'in' | 'out',
+  direction: SocketDirectionEnum,
   type: string,
   precision: ShaderPrecisionType | ''
 ) {
