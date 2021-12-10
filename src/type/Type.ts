@@ -43,17 +43,13 @@ export interface SetVectorOption {
 }
 
 export interface AbstractNodeData {
-  nodeType?: NodeTypeEnum;
   socketDataArray: Array<SocketData>;
 
   // defined by comments in a shader function code file
   nodeName: string;
   availableShaderStage: AvailableShaderStageEnum;
   guiMode: GUIModeEnum;
-  guiOptions?: {
-    pullDown?: PullDownOption;
-    setVector?: SetVectorOption;
-  };
+  nodeType?: NodeTypeEnum;
 }
 
 export interface ShaderityNodeData extends AbstractNodeData {
@@ -62,8 +58,13 @@ export interface ShaderityNodeData extends AbstractNodeData {
   shaderFunctionName: string;
   shaderFunctionCode: string;
   extensions?: Array<string>;
+  guiOptions?: {
+    pullDown?: PullDownOption;
+    setVector?: SetVectorOption;
+  };
 }
 
 export interface SamplerInputNodeData extends AbstractNodeData {
   nodeType: 'samplerInputNode';
+  guiMode: 'settexture';
 }
