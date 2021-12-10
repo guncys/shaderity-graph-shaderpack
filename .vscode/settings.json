@@ -10,5 +10,8 @@
     "texcoord",
     "uniformvalue",
     "vertexandfragment"
+  ],
+  "markdownlint.customRules": [
+    "\"MD033\": false"
   ]
 }

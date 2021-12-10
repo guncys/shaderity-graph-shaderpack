@@ -1,6 +1,15 @@
-# Specification of ShaderNodeData type
+# Specification of NodeData type
 
-When you import the glsl file in the typescript file of this library, we get a ShaderNodeData type object. The specification of the ShaderNodeData is following:
+The main purpose of this library is to create the definition data for each node of a node-based shader that uses shaderity-graph. The node data (the child interfaces of 'AbstractNodeData') are the definition data.
+
+The followings are the child interfaces of 'AbstractNodeData'.
+
+- [ShaderityNodeData](#shaderitynodedata)
+- [SamplerInputNodeData](#samplerinputnodedata)
+
+## ShaderityNodeData
+
+When you import the glsl file in the typescript file of this library, we get a ShaderityNodeData type object. The specification of the ShaderityNodeData is following:
 
 |Name|Type|Description|Required|
 |:--|:--|:--|:--|
@@ -12,8 +21,9 @@ When you import the glsl file in the typescript file of this library, we get a S
 |availableShaderStage|`string`|Specify the shader stage that this node can use|Yes ✅|
 |guiMode|`string`|Specify recommend gui mode|Yes ✅|
 |guiOptions|`Object`|Data required when using recommend gui mode|No|
+|nodeType|`string`|Specify the node data type|No|
 
-## shaderFunctionName ✅
+### ShaderityNodeData.shaderFunctionName ✅
 
 Name of entry shader function in the shaderFunctionCode.
 We use this name when calling the function corresponding to this node.
@@ -22,7 +32,7 @@ We use this name when calling the function corresponding to this node.
 
 - Required: Yes
 
-## shaderFunctionCode ✅
+### ShaderityNodeData.shaderFunctionCode ✅
 
 Shader functions corresponding to this node.
 There are two types of functions in the shaderFunctionCode.
@@ -34,7 +44,7 @@ There are two types of functions in the shaderFunctionCode.
 
 - Required: Yes
 
-## extensions
+### ShaderityNodeData.extensions
 
 Required extensions in the [shaderFunctionCode](#shaderfunctioncode).
 The lack of this property means that there are no necessary extensions.
@@ -43,7 +53,7 @@ The lack of this property means that there are no necessary extensions.
 
 - Required: No
 
-## socketDataArray ✅
+### ShaderityNodeData.socketDataArray ✅
 
 Data in the socket for use with shaderity-graph.
 Each socket data corresponds to an argument of the shader function corresponding to this node.
@@ -53,7 +63,7 @@ For more information, see the interface that extends AbstractSocketData in the S
 
 - Required: Yes
 
-## nodeName ✅
+### ShaderityNodeData.nodeName ✅
 
 Name to display in the GUI.
 
@@ -61,7 +71,7 @@ Name to display in the GUI.
 
 - Required: Yes
 
-## availableShaderStage ✅
+### ShaderityNodeData.availableShaderStage ✅
 
 Specify the shader stage that this node can use. If an invalid value is specified in the glsl file, the guiMode will be set to `vertexandfragment`.
 
@@ -75,7 +85,7 @@ Specify the shader stage that this node can use. If an invalid value is specifie
   - `vertexandfragment`: The shaderFunctionCode can be used in vertex and fragment shader.
   - `unknown`: Not used(A value that is only used by the loader)
 
-## guiMode ✅
+### ShaderityNodeData.guiMode ✅
 
 Specify recommend gui mode. If an invalid value is specified in the glsl file, the guiMode will be set to `standard`.
 
@@ -91,7 +101,19 @@ Specify recommend gui mode. If an invalid value is specified in the glsl file, t
   - `settexture`: The node has sockets and an image input field.
   - `unknown`: Not used(A value that is only used by the loader)
 
-## guiOptions
+### ShaderityNodeData.nodeType
+
+Specify the node data type. The value corresponding to this node data is `shaderityNode`.
+If this parameter is not specified, the value of `node data` is `shaderityNode`.
+
+- Type: `string`
+
+- Required: Yes
+
+- Allowed values
+  - `shaderityNode`
+
+### ShaderityNodeData.guiOptions
 
 If options are required for the specified guiMode, they will be written in this object.
 
@@ -104,7 +126,7 @@ If options are required for the specified guiMode, they will be written in this 
 
 - Required: No
 
-## guiOptions.pullDown
+### guiOptions.pullDown
 
 Options for guiMode: PullDown.
 If the guiMode is `pullDown`, this property is required.
@@ -118,7 +140,7 @@ If the guiMode is `pullDown`, this property is required.
 
 - Required: No
 
-## guiOptions.pullDown.description
+### guiOptions.pullDown.description
 
 Description of pull down menu.
 It is supposed to be displayed near the pull-down menu in the GUI as a description of what the menu is.
@@ -127,7 +149,7 @@ It is supposed to be displayed near the pull-down menu in the GUI as a descripti
 
 - Required: Yes
 
-## guiOptions.pullDown.items
+### guiOptions.pullDown.items
 
 Items of pull down menu.
 
@@ -142,7 +164,7 @@ Items of pull down menu.
 
 - Required: Yes
 
-## guiOptions.pullDown.item.functionName ✅
+### guiOptions.pullDown.item.functionName ✅
 
 Entry shader function name corresponding to the item
 
@@ -152,7 +174,7 @@ If the value of the pull-down menu changes, use the guiOptions.pullDown.item.fun
 
 - Required: Yes
 
-## guiOptions.pullDown.item.displayName
+### guiOptions.pullDown.item.displayName
 
 The name displayed in the GUI as an item in a pull-down menu.
 If this property is missing, display guiOptions.pullDown.item.functionName instead.
@@ -161,7 +183,7 @@ If this property is missing, display guiOptions.pullDown.item.functionName inste
 
 - Required: No
 
-## guiOptions.setVector
+### guiOptions.setVector
 
 Options for guiMode: setVector.
 When the guiMode is `setVector`, this property is used.
@@ -178,7 +200,7 @@ If there is no value to be specified for a VectorOption, there is no need to cre
 
 - Required: No
 
-## VectorOption
+### VectorOption
 
 |Name|Type|Description|Required|
 |:--|:--|:--|:--|
@@ -187,7 +209,7 @@ If there is no value to be specified for a VectorOption, there is no need to cre
 
 - Type: `Object`
 
-## VectorOption.descriptions
+### VectorOption.descriptions
 
 The description of each element.
 
@@ -198,7 +220,7 @@ Specify ['x', 'y', 'z', 'w'] as the default value in the library.
 
 - Required: No
 
-## VectorOption.defaultValues
+### VectorOption.defaultValues
 
 The default value of each element.
 
@@ -208,3 +230,71 @@ Specify [0, 0, 0, 0] as the default value in the library.
 - Type: `number[1-4]`
 
 - Required: No
+
+<br>
+
+## SamplerInputNodeData
+
+This is the NodeData for the Shaderity graph library to define the SamplerInputNode.
+
+|Name|Type|Description|Required|
+|:--|:--|:--|:--|
+|socketDataArray|`Object[2]`|Array of socket data in this node|Yes ✅|
+|nodeName|`string`|Name to display in the GUI|Yes ✅|
+|availableShaderStage|`string`|Specify the shader stage that this node can use|Yes ✅|
+|guiMode|`string`|Specify recommend gui mode|Yes ✅|
+|nodeType|`string`|Specify the node data type|Yes ✅|
+
+### SamplerInputNodeData.socketDataArray ✅
+
+Data in the socket for use with shaderity-graph.
+Each socket data corresponds to an argument of the shader function corresponding to this node.
+For more information, see the interface that extends AbstractSocketData in the Shaderity-Graph-JSON specification of [shaderity-graph](https://github.com/actnwit/shaderity-graph).
+
+- Type: `Object[0-*]`
+
+- Required: Yes
+
+### SamplerInputNodeData.nodeName ✅
+
+Name to display in the GUI.
+
+- Type: `string`
+
+- Required: Yes
+
+### SamplerInputNodeData.availableShaderStage ✅
+
+Specify the shader stage that this node can use. If an invalid value is specified in the glsl file, the guiMode will be set to `vertexandfragment`.
+
+- Type: `string`
+
+- Required: Yes
+
+- Allowed values
+  - `vertex`: The shaderFunctionCode can be used in only vertex shader.
+  - `fragment`: The shaderFunctionCode can be used in only fragment shader.
+  - `vertexandfragment`: The shaderFunctionCode can be used in vertex and fragment shader.
+  - `unknown`: Not used(A value that is only used by the loader)
+
+### SamplerInputNodeData.guiMode ✅
+
+Specify recommend gui mode. To choose a texture, the guiMode of this node is 'settexture'.
+
+- Type: `string`
+
+- Required: Yes
+
+- Allowed values
+  - `settexture`: The node has sockets and an image input field.
+
+### SamplerInputNodeData.nodeType
+
+Specify the node data type. The value corresponding to this node data is `samplerInputNode`.
+
+- Type: `string`
+
+- Required: Yes
+
+- Allowed values
+  - `samplerInputNode`
