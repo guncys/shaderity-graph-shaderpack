@@ -17,7 +17,8 @@ import {
   AvailableShaderStageEnum,
   GUIMode,
 } from '../src/type/Enum';
-import SG from 'shaderity-graph';
+import SG, {SamplerTypeEnum} from 'shaderity-graph';
+import {ShaderVaryingInterpolationType} from 'shaderity';
 
 module.exports = function (source: string) {
   (this as CustomNodeModule).cacheable();
@@ -289,7 +290,6 @@ function __setSamplerInputSocketData(
   direction: SocketDirectionEnum,
   samplerType: string
 ) {
-
   if (direction === SG.SocketDirection.Output) {
     throw new Error(
       'ShaderPackLoader.__setSamplerInputSocketData: This loader does not support sampler output socket'
@@ -299,7 +299,7 @@ function __setSamplerInputSocketData(
   const samplerInputSocketData = {
     socketName: argName,
     direction,
-    samplerType: samplerType as 'sampler2D' | 'samplerCube',
+    samplerType: samplerType as SamplerTypeEnum,
   };
 
   json.socketDataArray.push(samplerInputSocketData);
@@ -318,7 +318,7 @@ function __setAttributeSocketData(
 ) {
   const attributeInputSocketData = {
     socketName: argName,
-    direction: direction as 'in',
+    direction: direction,
     attributeData: {
       variableName: argName,
       type,
@@ -345,7 +345,7 @@ function __setUniformSocketData(
 ) {
   const uniformInputSocketData = {
     socketName: argName,
-    direction: direction as 'in',
+    direction,
     uniformData: {
       variableName: argName,
       type,
@@ -372,13 +372,13 @@ function __setVaryingSocketData(
 ) {
   const varyingSocketData = {
     socketName: argName,
-    direction: direction,
+    direction,
     varyingData: {
       type,
     },
   } as VaryingInputSocketData | VaryingOutputSocketData;
 
-  if (direction === 'out' && precision !== '') {
+  if (direction === SG.SocketDirection.Output && precision !== '') {
     const varyingOutputSocketData =
       varyingSocketData as VaryingOutputSocketData;
     varyingOutputSocketData.varyingData.precision = precision;
@@ -406,7 +406,7 @@ function __setStandardSocketData(
     },
   } as StandardInputSocketData | StandardOutputSocketData;
 
-  if (direction === 'out' && precision !== '') {
+  if (direction === SG.SocketDirection.Output && precision !== '') {
     const standardOutputSocketData =
       standardSocketData as StandardOutputSocketData;
     standardOutputSocketData.shaderData.precision = precision;
@@ -433,7 +433,10 @@ function __setShaderFunctionCode(
  * @private
  * Set required shader extension in the shader function to ShaderNodeData json.
  */
-function __setExtension(json: ShaderityNodeData, splittedOriginalCode: string[]) {
+function __setExtension(
+  json: ShaderityNodeData,
+  splittedOriginalCode: string[]
+) {
   if (splittedOriginalCode.length === 0) {
     return;
   }
@@ -604,14 +607,16 @@ function __setVaryingInterpolation(
 
     for (let j = 0; j < json.socketDataArray.length; j++) {
       const socketData = json.socketDataArray[j] as VaryingOutputSocketData;
-      if (socketData.direction !== 'out' || socketData.varyingData == null) {
+      if (
+        socketData.direction !== SG.SocketDirection.Output ||
+        socketData.varyingData == null
+      ) {
         continue;
       }
 
       if (socketData.socketName === variableName) {
-        socketData.varyingData.interpolationType = interpolationType as
-          | 'flat'
-          | 'smooth';
+        socketData.varyingData.interpolationType =
+          interpolationType as ShaderVaryingInterpolationType;
         break;
       }
     }
@@ -649,10 +654,10 @@ function __convertToShaderOutputSocket(
   for (let i = 0; i < sockets.length; i++) {
     const socket = sockets[i];
     if (socket.socketName === shaderOutputSocketVariableName) {
-      if (socket.direction === 'out') {
+      if (socket.direction === SG.SocketDirection.Output) {
         sockets[i] = {
           socketName: shaderOutputSocketVariableName,
-          direction: 'out',
+          direction: SG.SocketDirection.Output,
         };
       } else {
         console.error(
@@ -914,7 +919,10 @@ function __setGUISetVectorOptions(
  * the shader function whose variable name is 'outVec4' is set to 'vector4'
  */
 
-function __changeSocketName(json: ShaderityNodeData, sGSPcomments: SGSPcomment[]) {
+function __changeSocketName(
+  json: ShaderityNodeData,
+  sGSPcomments: SGSPcomment[]
+) {
   const regSocketName = /^SocketName[\t ]*:[\t ]*(.*)$/;
   const socketNames = __getAllParamsFromSGSPcomment(
     sGSPcomments,
