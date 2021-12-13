@@ -47,6 +47,7 @@ export interface AbstractNodeData {
 
   // defined by comments in a shader function code file
   nodeName: string;
+  category: string[];
   availableShaderStage: AvailableShaderStageEnum;
   guiMode: GUIModeEnum;
   nodeType?: NodeTypeEnum;

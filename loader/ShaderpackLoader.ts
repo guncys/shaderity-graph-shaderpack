@@ -28,6 +28,7 @@ module.exports = function (source: string) {
     shaderFunctionCode: '',
     socketDataArray: [],
     nodeName: '',
+    category: [],
     availableShaderStage: AvailableShaderStage.Unknown,
     guiMode: GUIMode.Unknown,
   };

@@ -3,6 +3,7 @@ declare module '*.glsl' {
   const shaderFunctionCode: string;
   const socketDataArray: [];
   const nodeName: string;
+  const category: string[];
   const availableShaderStage: 'vertex' | 'fragment' | 'vertexandfragment';
   const guiMode:
     | 'standard'
