@@ -2,6 +2,7 @@
   "name": "shaderity-graph-shaderpack",
   "version": "0.0.1",
   "main": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
   "files": [
     "dist"
   ],
