@@ -486,6 +486,15 @@ function __setNodeName(json: ShaderityNodeData, sGSPcomments: SGSPcomment[]) {
   json.nodeName = __getFirstParamFromSGSPcomment(sGSPcomments, regNodeName);
 }
 
+/**
+ * @private
+ * Set category to ShaderNodeData json.
+ *
+ * You can specify the category by writing the following comment somewhere in the glsl file:
+ * // <SGSP> Category: category subCategory
+ *
+ * In the above case, the category is [`category`, `subCategory`].
+ */
 function __setCategory(json: ShaderityNodeData, sGSPcomments: SGSPcomment[]) {
   const regCategory = /^Category[\t ]*:[\t ]*(.*)$/;
   const matchedStr = __getFirstParamFromSGSPcomment(sGSPcomments, regCategory);
