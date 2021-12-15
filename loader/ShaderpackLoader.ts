@@ -2,7 +2,7 @@ import {CustomNodeModule, SGSPcomment} from './ShaderpackLoaderType';
 import {
   AttributeInputSocketData,
   PullDownItem,
-  ShaderNodeData,
+  ShaderityNodeData,
   ShaderPrecisionType,
   SocketData,
   SocketDirectionEnum,
@@ -17,12 +17,13 @@ import {
   AvailableShaderStageEnum,
   GUIMode,
 } from '../src/type/Enum';
-import SG from 'shaderity-graph';
+import SG, {SamplerTypeEnum} from 'shaderity-graph';
+import {ShaderVaryingInterpolationType} from 'shaderity';
 
 module.exports = function (source: string) {
   (this as CustomNodeModule).cacheable();
 
-  const resultJson: ShaderNodeData = {
+  const resultJson: ShaderityNodeData = {
     shaderFunctionName: '',
     shaderFunctionCode: '',
     socketDataArray: [],
@@ -99,7 +100,7 @@ function __getCommentsForShaderityGraphShaderPack(
  * @param splittedOriginalCode The shader code written in the glsl file
  */
 function __setParamsFromShaderCode(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   splittedOriginalCode: string[]
 ) {
   const splittedShaderFunctionCode =
@@ -149,7 +150,7 @@ function __createSplittedShaderFunctionCode(splittedOriginalCode: string[]) {
  * Set the function name and the socket data to ShaderNodeData json.
  */
 function __setShaderFunctionNameAndSocketData(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   splittedShaderFunctionCode: string[]
 ) {
   const shaderFunctionLineNumber =
@@ -173,7 +174,7 @@ function __setShaderFunctionNameAndSocketData(
  * The entry shader function is the first function with a return value of void.
  */
 function __setShaderFunctionNameAndGetShaderFunctionLineNumber(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   splittedShaderFunctionCode: string[]
 ): number {
   for (let i = 0; i < splittedShaderFunctionCode.length; i++) {
@@ -203,7 +204,7 @@ function __setShaderFunctionNameAndGetShaderFunctionLineNumber(
  *       Call the __convertToShaderOutputSocket method after calling
  *       this method to replace the corresponding socket with a ShaderOutputSocket.
  */
-function __setSocketData(json: ShaderNodeData, shaderFuncArgs: string[]) {
+function __setSocketData(json: ShaderityNodeData, shaderFuncArgs: string[]) {
   const regArg =
     /^[\t ]*(in|out)[\t ]*(highp|mediump|lowp|)[\t ]+(\w+)[\t ]+(\w+)$/;
 
@@ -221,6 +222,12 @@ function __setSocketData(json: ShaderNodeData, shaderFuncArgs: string[]) {
         `ShaderpackLoader.__setSocketData: The argument of ${json.shaderFunctionName} is invalid.`
       );
       throw new Error();
+    }
+
+    const isSamplerInputSocket = type.match(/sampler/) != null;
+    if (isSamplerInputSocket) {
+      __setSamplerInputSocketData(json, argName, direction, type);
+      continue;
     }
 
     const isAttributeInputSocket = argName.match(/^a_/) != null;
@@ -275,18 +282,43 @@ function __getShaderFuncArgs(
 
 /**
  * @private
+ * Get the argument of the first function in the line after lineNumberVoidFunction.
+ */
+function __setSamplerInputSocketData(
+  json: ShaderityNodeData,
+  argName: string,
+  direction: SocketDirectionEnum,
+  samplerType: string
+) {
+  if (direction === SG.SocketDirection.Output) {
+    throw new Error(
+      'ShaderPackLoader.__setSamplerInputSocketData: This loader does not support sampler output socket'
+    );
+  }
+
+  const samplerInputSocketData = {
+    socketName: argName,
+    direction,
+    samplerType: samplerType as SamplerTypeEnum,
+  };
+
+  json.socketDataArray.push(samplerInputSocketData);
+}
+
+/**
+ * @private
  * Set attribute input socket data to ShaderNodeData json.
  */
 function __setAttributeSocketData(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   argName: string,
-  direction: 'in' | 'out',
+  direction: SocketDirectionEnum,
   type: string,
   precision: ShaderPrecisionType | ''
 ) {
   const attributeInputSocketData = {
     socketName: argName,
-    direction: direction as 'in',
+    direction: direction,
     attributeData: {
       variableName: argName,
       type,
@@ -305,15 +337,15 @@ function __setAttributeSocketData(
  * Set uniform input socket data to ShaderNodeData json.
  */
 function __setUniformSocketData(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   argName: string,
-  direction: 'in' | 'out',
+  direction: SocketDirectionEnum,
   type: string,
   precision: ShaderPrecisionType | ''
 ) {
   const uniformInputSocketData = {
     socketName: argName,
-    direction: direction as 'in',
+    direction,
     uniformData: {
       variableName: argName,
       type,
@@ -332,21 +364,21 @@ function __setUniformSocketData(
  * Set varying input/output socket data to ShaderNodeData json.
  */
 function __setVaryingSocketData(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   argName: string,
-  direction: 'in' | 'out',
+  direction: SocketDirectionEnum,
   type: string,
   precision: ShaderPrecisionType | ''
 ) {
   const varyingSocketData = {
     socketName: argName,
-    direction: direction,
+    direction,
     varyingData: {
       type,
     },
   } as VaryingInputSocketData | VaryingOutputSocketData;
 
-  if (direction === 'out' && precision !== '') {
+  if (direction === SG.SocketDirection.Output && precision !== '') {
     const varyingOutputSocketData =
       varyingSocketData as VaryingOutputSocketData;
     varyingOutputSocketData.varyingData.precision = precision;
@@ -360,7 +392,7 @@ function __setVaryingSocketData(
  * Set standard input/output socket data to ShaderNodeData json.
  */
 function __setStandardSocketData(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   argName: string,
   direction: SocketDirectionEnum,
   type: string,
@@ -374,7 +406,7 @@ function __setStandardSocketData(
     },
   } as StandardInputSocketData | StandardOutputSocketData;
 
-  if (direction === 'out' && precision !== '') {
+  if (direction === SG.SocketDirection.Output && precision !== '') {
     const standardOutputSocketData =
       standardSocketData as StandardOutputSocketData;
     standardOutputSocketData.shaderData.precision = precision;
@@ -391,7 +423,7 @@ function __setStandardSocketData(
  * filled with the result of the __createSplittedShaderFunctionCode method.
  */
 function __setShaderFunctionCode(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   splittedShaderFunctionCode: string[]
 ) {
   json.shaderFunctionCode = __joinSplittedLine(splittedShaderFunctionCode);
@@ -401,7 +433,10 @@ function __setShaderFunctionCode(
  * @private
  * Set required shader extension in the shader function to ShaderNodeData json.
  */
-function __setExtension(json: ShaderNodeData, splittedOriginalCode: string[]) {
+function __setExtension(
+  json: ShaderityNodeData,
+  splittedOriginalCode: string[]
+) {
   if (splittedOriginalCode.length === 0) {
     return;
   }
@@ -424,7 +459,7 @@ function __setExtension(json: ShaderNodeData, splittedOriginalCode: string[]) {
  * @param sGSPcomments comments beginning with "// <SGSP>"
  */
 function __setParamsFromSGSPcomments(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   sGSPcomments: SGSPcomment[]
 ) {
   __setNodeName(json, sGSPcomments);
@@ -444,7 +479,7 @@ function __setParamsFromSGSPcomments(
  *
  * In the above case, the node name is 'sample node name'.
  */
-function __setNodeName(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
+function __setNodeName(json: ShaderityNodeData, sGSPcomments: SGSPcomment[]) {
   const regNodeName = /^NodeName[\t ]*:[\t ]*(.*)$/;
   json.nodeName = __getFirstParamFromSGSPcomment(sGSPcomments, regNodeName);
 }
@@ -461,7 +496,7 @@ function __setNodeName(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
  * The default value is 'VertexAndFragment'.
  */
 function __setAvailableShaderStage(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   sGSPcomments: SGSPcomment[]
 ) {
   const regAvailableShaderStage = /^AvailableShaderStage[\t ]*:[\t ]*(.*)$/;
@@ -529,7 +564,7 @@ function __checkSetCorrectAvailableShaderStage(
  * The allowed values are 'Standard', 'PullDown', 'SetVector', 'SetMatrix' and 'SetTexture'.
  * The default value is 'Standard'.
  */
-function __setGUIMode(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
+function __setGUIMode(json: ShaderityNodeData, sGSPcomments: SGSPcomment[]) {
   const regGUIMode = /^GUIMode[\t ]*:[\t ]*(.*)$/;
   const matchedStr = __getFirstParamFromSGSPcomment(sGSPcomments, regGUIMode);
   json.guiMode = GUIMode.fromString(matchedStr);
@@ -555,7 +590,7 @@ function __setGUIMode(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
  * The valid interpolation type values are 'flat'and 'smooth'.
  */
 function __setVaryingInterpolation(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   sGSPcomments: SGSPcomment[]
 ) {
   const regVaryingInterpolation = /^VaryingInterpolation[\t ]*:[\t ]*(.*)$/;
@@ -572,14 +607,16 @@ function __setVaryingInterpolation(
 
     for (let j = 0; j < json.socketDataArray.length; j++) {
       const socketData = json.socketDataArray[j] as VaryingOutputSocketData;
-      if (socketData.direction !== 'out' || socketData.varyingData == null) {
+      if (
+        socketData.direction !== SG.SocketDirection.Output ||
+        socketData.varyingData == null
+      ) {
         continue;
       }
 
       if (socketData.socketName === variableName) {
-        socketData.varyingData.interpolationType = interpolationType as
-          | 'flat'
-          | 'smooth';
+        socketData.varyingData.interpolationType =
+          interpolationType as ShaderVaryingInterpolationType;
         break;
       }
     }
@@ -600,7 +637,7 @@ function __setVaryingInterpolation(
  * to the shader output socket.
  */
 function __convertToShaderOutputSocket(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   sGSPcomments: SGSPcomment[]
 ) {
   const regShaderOutputSocket = /^ShaderOutputSocket[\t ]*:[\t ]*(.*)$/;
@@ -617,10 +654,10 @@ function __convertToShaderOutputSocket(
   for (let i = 0; i < sockets.length; i++) {
     const socket = sockets[i];
     if (socket.socketName === shaderOutputSocketVariableName) {
-      if (socket.direction === 'out') {
+      if (socket.direction === SG.SocketDirection.Output) {
         sockets[i] = {
           socketName: shaderOutputSocketVariableName,
-          direction: 'out',
+          direction: SG.SocketDirection.Output,
         };
       } else {
         console.error(
@@ -639,7 +676,7 @@ function __convertToShaderOutputSocket(
  * not to share the uniform variable.
  */
 function __removeNonSharingUniformVariableName(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   sGSPcomments: SGSPcomment[]
 ) {
   const regSharingUniformVariable = /^SharingUniformVariable[\t ]*:[\t ]*(.*)$/;
@@ -721,7 +758,7 @@ function __getAllParamsFromSGSPcomment(
  * The __setGUIMode method must be called prior to this method
  */
 function __setGUIOptions(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   splittedOriginalCode: string[],
   sGSPcomments: SGSPcomment[]
 ) {
@@ -747,7 +784,7 @@ function __setGUIOptions(
  * void inputPosition_view(
  */
 function __setGUIPullDownOptions(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   splittedOriginalCode: string[]
 ) {
   json.guiOptions = json.guiOptions ?? {};
@@ -758,6 +795,8 @@ function __setGUIPullDownOptions(
 
   const regPullDownDescription = /^PullDown_Description[\t ]*:[\t ]*(.*)$/;
   const regPullDownDisplayName = /^PullDown_DisplayName[\t ]*:[\t ]*(.*)$/;
+
+  const functionNames: string[] = [];
 
   let displayName: string | undefined;
   for (let i = 0; i < splittedOriginalCode.length; i++) {
@@ -783,6 +822,16 @@ function __setGUIPullDownOptions(
     const matchedLineVoidFunc = line.match(regVoidFuncStart);
     if (matchedLineVoidFunc != null) {
       const functionName = matchedLineVoidFunc[1].trim();
+      const duplicateFunctionName = functionNames.some(
+        name => name === functionName
+      );
+
+      if (duplicateFunctionName) {
+        throw new Error(
+          'ShaderpackLoader.__setGUIPullDownOptions: found duplicate function name'
+        );
+      }
+      functionNames.push(functionName);
 
       const item: PullDownItem = {functionName};
       if (displayName != null) {
@@ -806,7 +855,7 @@ function __setGUIPullDownOptions(
  * // <SGSP> SetVector_DefaultValues: u_uniformSocketName 1 1 1 1
  */
 function __setGUISetVectorOptions(
-  json: ShaderNodeData,
+  json: ShaderityNodeData,
   sGSPcomments: SGSPcomment[]
 ) {
   const regSetVectorDescriptions = /^SetVector_Descriptions[\t ]*:[\t ]*(.*)$/;
@@ -870,7 +919,10 @@ function __setGUISetVectorOptions(
  * the shader function whose variable name is 'outVec4' is set to 'vector4'
  */
 
-function __changeSocketName(json: ShaderNodeData, sGSPcomments: SGSPcomment[]) {
+function __changeSocketName(
+  json: ShaderityNodeData,
+  sGSPcomments: SGSPcomment[]
+) {
   const regSocketName = /^SocketName[\t ]*:[\t ]*(.*)$/;
   const socketNames = __getAllParamsFromSGSPcomment(
     sGSPcomments,

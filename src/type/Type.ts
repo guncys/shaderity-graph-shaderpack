@@ -9,6 +9,7 @@ import {
   UniformInputSocketData as _UniformInputSocketData,
   SocketDirectionEnum as _SocketDirectionEnum,
   ShaderPrecisionType as _ShaderPrecisionType,
+  NodeTypeEnum as _NodeTypeEnum,
 } from 'shaderity-graph';
 
 export type SocketData = _SocketData;
@@ -20,6 +21,7 @@ export type VaryingOutputSocketData = _VaryingOutputSocketData;
 export type UniformInputSocketData = _UniformInputSocketData;
 export type SocketDirectionEnum = _SocketDirectionEnum;
 export type ShaderPrecisionType = _ShaderPrecisionType;
+export type NodeTypeEnum = _NodeTypeEnum;
 
 export interface PullDownItem {
   functionName: string;
@@ -40,18 +42,29 @@ export interface SetVectorOption {
   [uniformVariableName: string]: VectorOption;
 }
 
-export interface ShaderNodeData {
-  shaderFunctionName: string;
-  shaderFunctionCode: string;
-  extensions?: Array<string>;
+export interface AbstractNodeData {
   socketDataArray: Array<SocketData>;
 
   // defined by comments in a shader function code file
   nodeName: string;
   availableShaderStage: AvailableShaderStageEnum;
   guiMode: GUIModeEnum;
+  nodeType?: NodeTypeEnum;
+}
+
+export interface ShaderityNodeData extends AbstractNodeData {
+  nodeType?: 'shaderityNode';
+
+  shaderFunctionName: string;
+  shaderFunctionCode: string;
+  extensions?: Array<string>;
   guiOptions?: {
     pullDown?: PullDownOption;
     setVector?: SetVectorOption;
   };
+}
+
+export interface SamplerInputNodeData extends AbstractNodeData {
+  nodeType: 'samplerInputNode';
+  guiMode: 'settexture';
 }
