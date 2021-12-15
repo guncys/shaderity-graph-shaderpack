@@ -70,6 +70,8 @@ The following is the parameter name list
 - [SocketName](#socketname)
 - [PullDown_Description](#pulldown_description)
 - [PullDown_DisplayName](#pulldown_displayname)
+- [SetVector_Descriptions](#setvector_descriptions)
+- [SetVector_DefaultValues](#setvector_defaultvalues)
 
 ### NodeName
 
@@ -98,6 +100,29 @@ Shader stage that can be used by node.
 ### GUIMode
 
 Appearance of node.
+
+- Standard
+
+- PullDown
+
+  The node has pull down list.
+  This node can choose the entry function to use.
+
+- SetVector
+
+  The node has number input field of vector.
+  This node can specify the input value of a vector type uniform input socket.
+
+- SetMatrix
+
+  The node has number input field of matrix.
+  This node can specify the input value of a matrix type uniform input socket.
+
+- Texture
+
+  The node has texture input field.
+  This node can specify the input value of a texture type uniform input socket.
+
 
 ``` glsl
 // <SGSP> GUIMode: (gui mode name)
@@ -185,3 +210,47 @@ Specify the display name of pull down list.
 // e.g.
 // <SGSP> PullDown_DisplayName: world position
 ```
+
+### SetVector_Descriptions
+
+This parameter is only used when the GUIMode is in SetVector mode.
+
+Specify the description of each element of a vector or scalar.
+If you want to specify the description of multiple elements, such as vector 2, separate the elements with spaces.
+
+``` glsl
+// <SGSP> SetVector_Descriptions: (target uniform variable name in shader function argument) (descriptions)
+
+// e.g.
+// <SGSP> SetVector_Descriptions: u_outVec3 r g b
+```
+
+When the GUIMode is in SetVector mode and this parameter is not specified, the following default values are used.
+
+- Default Values:
+  - `x` (Scalar)
+  - `x y` (Vec2)
+  - `x y z` (Vec3)
+  - `x y z w` (Vec4)
+
+### SetVector_DefaultValues
+
+This parameter is only used when the GUIMode is in SetVector mode.
+
+Specify the default values of each element of a vector or scalar.
+If you want to specify the description of multiple elements, such as vector 2, separate the elements with spaces.
+
+``` glsl
+// <SGSP> SetVector_DefaultValues: (target uniform variable name in shader function argument) (default values)
+
+// e.g.
+// <SGSP> SetVector_DefaultValues: u_outVec3 1.0 1.0 1.0
+```
+
+When the GUIMode is in SetVector mode and this parameter is not specified, the following default values are used.
+
+- Default Values:
+  - `0` (Scalar)
+  - `0 0` (Vec2)
+  - `0 0 0` (Vec3)
+  - `0 0 0 0` (Vec4)

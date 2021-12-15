@@ -26,6 +26,20 @@ export interface PullDownItem {
   displayName?: string;
 }
 
+export interface PullDownOption {
+  description: string;
+  items: PullDownItem[];
+}
+
+export interface VectorOption {
+  descriptions?: string[];
+  defaultValues?: number[];
+}
+
+export interface SetVectorOption {
+  [uniformVariableName: string]: VectorOption;
+}
+
 export interface ShaderNodeData {
   shaderFunctionName: string;
   shaderFunctionCode: string;
@@ -37,9 +51,7 @@ export interface ShaderNodeData {
   availableShaderStage: AvailableShaderStageEnum;
   guiMode: GUIModeEnum;
   guiOptions?: {
-    pullDown?: {
-      description: string;
-      items: PullDownItem[];
-    };
+    pullDown?: PullDownOption;
+    setVector?: SetVectorOption;
   };
 }

@@ -98,6 +98,7 @@ If options are required for the specified guiMode, they will be written in this 
 |Name|Type|Description|Required|
 |:--|:--|:--|:--|
 |pullDown|`Object`|Options for guiMode: PullDown|No|
+|setVector|`Object`|Options for guiMode: SetVector|No|
 
 - Type: `Object`
 
@@ -111,7 +112,7 @@ If the guiMode is `pullDown`, this property is required.
 |Name|Type|Description|Required|
 |:--|:--|:--|:--|
 |description|`string`|Description of pull down menu|Yes ✅|
-|items|`Object`||Yes ✅|
+|items|`Object`|Options of pull down items|Yes ✅|
 
 - Type: `Object`
 
@@ -157,5 +158,53 @@ The name displayed in the GUI as an item in a pull-down menu.
 If this property is missing, display guiOptions.pullDown.item.functionName instead.
 
 - Type: `string`
+
+- Required: No
+
+## guiOptions.setVector
+
+Options for guiMode: setVector.
+When the guiMode is `setVector`, this property is used.
+
+|Name|Type|Description|Required|
+|:--|:--|:--|:--|
+|(uniform variable name)|`Object`|VectorOption object|No|
+
+The key of the guiOptions.setVector object is the argument variable name of the shader function which is corresponding to vector(or scalar) type uniform input socket.
+
+If there is no value to be specified for a VectorOption, there is no need to create a VectorOption object for that uniform variable name.
+
+- Type: `string`
+
+- Required: No
+
+## VectorOption
+
+|Name|Type|Description|Required|
+|:--|:--|:--|:--|
+|descriptions|`string`|Description of each element|No|
+|defaultValues|`number[]`|Default value of each element|No|
+
+- Type: `Object`
+
+## VectorOption.descriptions
+
+The description of each element.
+
+If this value is not set, the default value of the library that uses this library will be applied.
+Specify ['x', 'y', 'z', 'w'] as the default value in the library.
+
+- Type: `string[1-4]`
+
+- Required: No
+
+## VectorOption.defaultValues
+
+The default value of each element.
+
+If this value is not set, the default value of the library that uses this library will be applied.
+Specify [0, 0, 0, 0] as the default value in the library.
+
+- Type: `number[1-4]`
 
 - Required: No

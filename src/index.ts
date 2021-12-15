@@ -4,7 +4,13 @@ import {
   AvailableShaderStage,
   AvailableShaderStageEnum,
 } from './type/Enum';
-import {ShaderNodeData, PullDownItem} from './type/Type';
+import {
+  ShaderNodeData,
+  PullDownItem,
+  PullDownOption,
+  VectorOption,
+  SetVectorOption,
+} from './type/Type';
 import {ShaderPack} from './shaderityShaders/ShaderPack';
 
 export default {
@@ -18,4 +24,7 @@ export type {
   AvailableShaderStageEnum,
   ShaderNodeData,
   PullDownItem,
+  PullDownOption,
+  VectorOption,
+  SetVectorOption,
 };
