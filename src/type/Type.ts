@@ -1,12 +1,35 @@
 import {GUIModeEnum, AvailableShaderStageEnum} from './Enum';
-import {SocketData as _SocketData} from 'shaderity-graph';
+import {
+  SocketData as _SocketData,
+  StandardInputSocketData as _StandardInputSocketData,
+  StandardOutputSocketData as _StandardOutputSocketData,
+  AttributeInputSocketData as _AttributeInputSocketData,
+  VaryingInputSocketData as _VaryingInputSocketData,
+  VaryingOutputSocketData as _VaryingOutputSocketData,
+  UniformInputSocketData as _UniformInputSocketData,
+  SocketDirectionEnum as _SocketDirectionEnum,
+  ShaderPrecisionType as _ShaderPrecisionType,
+} from 'shaderity-graph';
 
 export type SocketData = _SocketData;
+export type StandardInputSocketData = _StandardInputSocketData;
+export type StandardOutputSocketData = _StandardOutputSocketData;
+export type AttributeInputSocketData = _AttributeInputSocketData;
+export type VaryingInputSocketData = _VaryingInputSocketData;
+export type VaryingOutputSocketData = _VaryingOutputSocketData;
+export type UniformInputSocketData = _UniformInputSocketData;
+export type SocketDirectionEnum = _SocketDirectionEnum;
+export type ShaderPrecisionType = _ShaderPrecisionType;
+
+export interface PullDownItem {
+  functionName: string;
+  displayName?: string;
+}
 
 export interface ShaderNodeData {
   shaderFunctionName: string;
   shaderFunctionCode: string;
-  extensions: Array<string>;
+  extensions?: Array<string>;
   socketDataArray: Array<SocketData>;
 
   // defined by comments in a shader function code file
@@ -15,7 +38,8 @@ export interface ShaderNodeData {
   guiMode: GUIModeEnum;
   guiOptions?: {
     pullDown?: {
-      shaderFunctionNames: Array<string>;
+      description: string;
+      items: PullDownItem[];
     };
   };
 }
