@@ -1,4 +1,5 @@
 // <SGSP> NodeName: Vector4
+// <SGSP> Category: Input Basic
 // <SGSP> GUIMode: SetVector
 
 // <SGSP> SocketName: outVec4 vector4

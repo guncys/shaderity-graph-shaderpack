@@ -1,4 +1,5 @@
 // <SGSP> NodeName: input position
+// <SGSP> Category: Input Geometry
 // <SGSP> AvailableShaderStage: Vertex
 // <SGSP> GUIMode: PullDown
 // <SGSP> SharingUniformVariable: u_worldMatrix u_viewMatrix u_projectionMatrix

@@ -18,6 +18,7 @@ When you import the glsl file in the typescript file of this library, we get a S
 |extensions|`string[0-*]`|Required extensions in the shaderFunctionCode|No|
 |socketDataArray|`Object[0-*]`|Array of socket data in this node|Yes ✅|
 |nodeName|`string`|Name to display in the GUI|Yes ✅|
+|category|`string[0-*]`|Category according to the role of the node|Yes ✅|
 |availableShaderStage|`string`|Specify the shader stage that this node can use|Yes ✅|
 |guiMode|`string`|Specify recommend gui mode|Yes ✅|
 |guiOptions|`Object`|Data required when using recommend gui mode|No|
@@ -68,6 +69,14 @@ For more information, see the interface that extends AbstractSocketData in the S
 Name to display in the GUI.
 
 - Type: `string`
+
+- Required: Yes
+
+### ShaderityNodeData.category ✅
+
+Category according to the role of the node. The category hierarchy can be used to select nodes such as in a menu screen for adding nodes.
+
+- Type: `string[0-*]`
 
 - Required: Yes
 
@@ -241,6 +250,7 @@ This is the NodeData for the Shaderity graph library to define the SamplerInputN
 |:--|:--|:--|:--|
 |socketDataArray|`Object[2]`|Array of socket data in this node|Yes ✅|
 |nodeName|`string`|Name to display in the GUI|Yes ✅|
+|category|`string[0-*]`|Category according to the role of the node|Yes ✅|
 |availableShaderStage|`string`|Specify the shader stage that this node can use|Yes ✅|
 |guiMode|`string`|Specify recommend gui mode|Yes ✅|
 |nodeType|`string`|Specify the node data type|Yes ✅|

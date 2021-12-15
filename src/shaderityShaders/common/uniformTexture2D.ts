@@ -19,6 +19,7 @@ export default {
   ],
 
   nodeName: 'Texture 2D',
+  category: ['Input', 'Texture'],
   availableShaderStage: AvailableShaderStage.VertexAndFragment,
   guiMode: GUIMode.SetTexture,
 } as SamplerInputNodeData;

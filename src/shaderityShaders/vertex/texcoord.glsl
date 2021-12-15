@@ -1,4 +1,5 @@
 // <SGSP> NodeName: UV Coordinate
+// <SGSP> Category: Input Geometry
 // <SGSP> AvailableShaderStage: Vertex
 // <SGSP> GUIMode: PullDown
 

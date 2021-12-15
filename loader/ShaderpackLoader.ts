@@ -28,6 +28,7 @@ module.exports = function (source: string) {
     shaderFunctionCode: '',
     socketDataArray: [],
     nodeName: '',
+    category: [],
     availableShaderStage: AvailableShaderStage.Unknown,
     guiMode: GUIMode.Unknown,
   };
@@ -463,6 +464,7 @@ function __setParamsFromSGSPcomments(
   sGSPcomments: SGSPcomment[]
 ) {
   __setNodeName(json, sGSPcomments);
+  __setCategory(json, sGSPcomments);
   __setAvailableShaderStage(json, sGSPcomments);
   __setGUIMode(json, sGSPcomments);
   __setVaryingInterpolation(json, sGSPcomments);
@@ -482,6 +484,21 @@ function __setParamsFromSGSPcomments(
 function __setNodeName(json: ShaderityNodeData, sGSPcomments: SGSPcomment[]) {
   const regNodeName = /^NodeName[\t ]*:[\t ]*(.*)$/;
   json.nodeName = __getFirstParamFromSGSPcomment(sGSPcomments, regNodeName);
+}
+
+/**
+ * @private
+ * Set category to ShaderNodeData json.
+ *
+ * You can specify the category by writing the following comment somewhere in the glsl file:
+ * // <SGSP> Category: category subCategory
+ *
+ * In the above case, the category is [`category`, `subCategory`].
+ */
+function __setCategory(json: ShaderityNodeData, sGSPcomments: SGSPcomment[]) {
+  const regCategory = /^Category[\t ]*:[\t ]*(.*)$/;
+  const matchedStr = __getFirstParamFromSGSPcomment(sGSPcomments, regCategory);
+  json.category = matchedStr.split(/[\t ]+/);
 }
 
 /**

@@ -1,4 +1,5 @@
 // <SGSP> NodeName: Sample Texture 2D
+// <SGSP> Category: Input Texture
 // <SGSP> GUIMode: PullDown
 
 // <SGSP> SocketName: tex texture2D
