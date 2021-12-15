@@ -27,11 +27,12 @@
     "shaderity-graph": "^0.1.2"
   },
   "scripts": {
-    "prepare": "husky install",
-    "build": "npm run build-esm && npm run build-umd-dev && npm run build-umd-prod",
+    "prepare": "husky install && npm run build-loader",
+    "build": "npm run build-loader && npm run build-esm && npm run build-umd-dev && npm run build-umd-prod",
     "build-umd-dev": "npx webpack --config ./config/webpack/webpack.config.development.js",
     "build-umd-prod": "npx webpack --config ./config/webpack/webpack.config.production.js",
     "build-esm": "npx webpack --config ./config/webpack/webpack.config.common_module.js",
+    "build-loader": "tsc -p ./loader/",
     "gts-lint": "gts lint ./src",
     "gts-clean": "gts clean ./src",
     "gts-fix": "gts fix ./src"

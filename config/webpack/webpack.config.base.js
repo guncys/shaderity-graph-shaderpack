@@ -1,17 +1,21 @@
+const path = require('path');
+
 module.exports = {
   entry: './src/index.ts',
 
   module: {
     rules: [
       {
-        test: /\.(glsl|vs|fs|vert|frag)$/,
+        test: /\.glsl$/,
         exclude: /node_modules/,
-        use: ['shaderity-loader'],
-      },
-      {
-        test: /VERSION-FILE$/,
-        exclude: /node_modules/,
-        use: ['version-loader'],
+        use: [
+          {
+            loader: path.resolve(
+              __dirname,
+              './../../loader/dist/loader/shaderpackLoader.js'
+            ),
+          },
+        ],
       },
       {
         test: /\.json$/,
