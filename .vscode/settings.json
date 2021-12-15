@@ -6,5 +6,8 @@
     "setmatrix",
     "settexture",
     "SGSP",
+    "Shaderpack",
+    "uniformvalue",
+    "vertexandfragment",
   ]
 }
