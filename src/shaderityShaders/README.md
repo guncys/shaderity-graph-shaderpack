@@ -72,6 +72,7 @@ The following is the parameter name list
 - [PullDown_DisplayName](#pulldown_displayname)
 - [SetVector_Descriptions](#setvector_descriptions)
 - [SetVector_DefaultValues](#setvector_defaultvalues)
+- [SetMatrix_DefaultValues](#setmatrix_defaultvalues)
 
 ### NodeName
 
@@ -116,7 +117,7 @@ Appearance of node.
 - SetMatrix
 
   The node has number input field of matrix.
-  This node can specify the input value of a matrix type uniform input socket.
+  This node can specify the input value of a matrix type uniform input socket. For this node, the input socket must be only one uniform input socket.
 
 - Texture
 
@@ -247,10 +248,37 @@ If you want to specify the description of multiple elements, such as vector 2, s
 // <SGSP> SetVector_DefaultValues: u_outVec3 1.0 1.0 1.0
 ```
 
-When the GUIMode is in SetVector mode and this parameter is not specified, the following default values are used.
+- Implementation Note: When the GUIMode is in SetVector mode and this parameter is not specified, the following default values are used:
 
 - Default Values:
   - `0` (Scalar)
   - `0 0` (Vec2)
   - `0 0 0` (Vec3)
   - `0 0 0 0` (Vec4)
+
+### SetMatrix_DefaultValues
+
+This parameter is only used when the GUIMode is in SetMatrix mode.
+
+Specify the default values of each element of a matrix.
+Separate each number with a space or tab. Matrices have row priority.
+
+
+``` glsl
+// <SGSP> SetMatrix_DefaultValues: (default values)
+
+// e.g.
+// <SGSP> SetMatrix_DefaultValues:  1 0 0 0   1 2 0 0   0 0 1 0   0 0 0 1
+
+//  1 0 0 0
+//  1 2 0 0
+//  0 0 1 0
+//  0 0 0 1
+```
+
+- Implementation Note: When the GUIMode is in SetMatrix mode and this parameter is not specified, the default values are the identity matrices like followings:
+
+- Default Values:
+  - `1 0   0 1` (Mat22)
+  - `1 0 0   0 1 0   0 0 1` (Mat33)
+  - `1 0 0 0   0 1 0 0  0 0 1 0   0 0 0 1` (Mat44)
