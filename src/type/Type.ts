@@ -42,6 +42,10 @@ export interface SetVectorOption {
   [uniformVariableName: string]: VectorOption;
 }
 
+export interface SetMatrixOption {
+  defaultValues: number[];
+}
+
 export interface AbstractNodeData {
   socketDataArray: Array<SocketData>;
 
@@ -62,6 +66,7 @@ export interface ShaderityNodeData extends AbstractNodeData {
   guiOptions?: {
     pullDown?: PullDownOption;
     setVector?: SetVectorOption;
+    setMatrix?: SetMatrixOption;
   };
 }
 

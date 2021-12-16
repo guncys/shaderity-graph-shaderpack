@@ -130,6 +130,7 @@ If options are required for the specified guiMode, they will be written in this 
 |:--|:--|:--|:--|
 |pullDown|`Object`|Options for guiMode: PullDown|No|
 |setVector|`Object`|Options for guiMode: SetVector|No|
+|setMatrix|`Object`|Options for guiMode: SetMatrix|No|
 
 - Type: `Object`
 
@@ -205,7 +206,7 @@ The key of the guiOptions.setVector object is the argument variable name of the 
 
 If there is no value to be specified for a VectorOption, there is no need to create a VectorOption object for that uniform variable name.
 
-- Type: `string`
+- Type: `Object`
 
 - Required: No
 
@@ -239,6 +240,27 @@ Specify [0, 0, 0, 0] as the default value in the library.
 - Type: `number[1-4]`
 
 - Required: No
+
+### guiOptions.setMatrix
+
+Options for guiMode: setMatrix.
+When the guiMode is `setMatrix`, this property is used.
+
+|Name|Type|Description|Required|
+|:--|:--|:--|:--|
+|defaultValues|`number[4,9,16]`|defaultValues of matrix|Yes ✅|
+
+- Type: `Object`
+
+- Required: No
+
+### guiOptions.setMatrix.defaultValues ✅
+
+The defaultValues of matrix. If the guiMode is the setMatrix and this property does not exist, the default value is the identity matrix.
+
+- Type: `number[4,9,16]`
+
+- Required: Yes
 
 <br>
 

@@ -783,6 +783,8 @@ function __setGUIOptions(
     __setGUIPullDownOptions(json, splittedOriginalCode);
   } else if (json.guiMode === GUIMode.SetVector) {
     __setGUISetVectorOptions(json, sGSPcomments);
+  } else if (json.guiMode === GUIMode.SetMatrix) {
+    __setGUISetMatrixOptions(json, sGSPcomments);
   }
 }
 
@@ -918,6 +920,40 @@ function __setGUISetVectorOptions(
       json.guiOptions.setVector[socketName] ?? {};
     json.guiOptions.setVector[socketName].defaultValues = defaultValues;
   }
+}
+
+/**
+ * @private
+ * Set GUIOption parameters for set matrix mode to the ShaderNodeData json.
+ * You can set 'SetMatrix_DefaultValues'.
+ * We don't need to specify the socket in this option since
+ * the set matrix node can have only one input socket.
+ *
+ * To set 'SetMatrix_DefaultValues', write the following comment somewhere in the glsl file:
+ * // <SGSP> SetMatrix_DefaultValues: 1 0 0 0   0 1 0 0   0 0 1 0   0 0 0 1
+ */
+function __setGUISetMatrixOptions(
+  json: ShaderityNodeData,
+  sGSPcomments: SGSPcomment[]
+) {
+  const regSetMatrixDefaultValues =
+    /^SetMatrix_DefaultValues[\t ]*:[\t ]*(.*)$/;
+
+  const matchedDefaultValuesArray = __getFirstParamFromSGSPcomment(
+    sGSPcomments,
+    regSetMatrixDefaultValues
+  );
+
+  if (matchedDefaultValuesArray.length === 0) {
+    return;
+  }
+
+  const defaultValues = matchedDefaultValuesArray.split(/[\t ]+/);
+
+  json.guiOptions = json.guiOptions ?? {};
+  json.guiOptions.setMatrix = {
+    defaultValues: defaultValues.map(str => Number(str)),
+  };
 }
 
 /**

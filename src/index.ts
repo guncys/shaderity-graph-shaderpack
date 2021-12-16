@@ -12,6 +12,7 @@ import {
   PullDownOption,
   VectorOption,
   SetVectorOption,
+  SetMatrixOption,
 } from './type/Type';
 import {ShaderPack} from './shaderityShaders/ShaderPack';
 
@@ -31,4 +32,5 @@ export type {
   PullDownOption,
   VectorOption,
   SetVectorOption,
+  SetMatrixOption,
 };
