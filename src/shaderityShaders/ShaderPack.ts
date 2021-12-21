@@ -1,5 +1,11 @@
 import {AbstractNodeData} from './../type/Type';
 
+import boolean from './Input/Basic/boolean.glsl';
+import constant from './Input/Basic/constant.glsl';
+import uniformInt from './Input/Basic/uniformInt.glsl';
+import uniformFloat from './Input/Basic/uniformFloat.glsl';
+import uniformVector2 from './Input/Basic/uniformVector2.glsl';
+import uniformVector3 from './Input/Basic/uniformVector3.glsl';
 import uniformVector4 from './Input/Basic/uniformVector4.glsl';
 
 import inputPosition from './Input/Geometry/inputPosition.vs.glsl';
@@ -14,12 +20,18 @@ import fragmentColor from './Utility/Output/fragmentColor.fs.glsl';
 import vertexPosition from './Utility/Output/vertexPosition.vs.glsl';
 
 export const ShaderPack: AbstractNodeData[] = [
-  uniformTexture2D,
+  boolean,
+  uniformInt,
+  uniformFloat,
+  uniformVector2,
+  uniformVector3,
   uniformVector4,
+  constant,
+  inputPosition,
+  texcoord,
   uniformMatrix44,
   sampleTexture2D,
-  inputPosition,
-  vertexPosition,
-  texcoord,
+  uniformTexture2D,
   fragmentColor,
+  vertexPosition,
 ];
