@@ -865,13 +865,16 @@ function __setGUIPullDownOptions(
 /**
  * @private
  * Set GUIOption parameters for set vector mode to the ShaderNodeData json.
- * You can set two options 'SetVector_Descriptions' and 'SetVector_DefaultValues'.
+ * You can set three options 'SetVector_Descriptions', 'SetVector_DefaultValues' and 'SetVector_Step'.
  *
  * To set 'SetVector_Descriptions', write the following comment somewhere in the glsl file:
  * // <SGSP> SetVector_Descriptions: u_uniformSocketName r g b a
  *
  * To set 'SetVector_DefaultValues', write the following comment somewhere in the glsl file:
  * // <SGSP> SetVector_DefaultValues: u_uniformSocketName 1 1 1 1
+ *
+ * To set 'SetVector_Step', write the following comment somewhere in the glsl file:
+ * // <SGSP> SetVector_Step: u_uniformSocketName 1
  */
 function __setGUISetVectorOptions(
   json: ShaderityNodeData,
@@ -880,6 +883,7 @@ function __setGUISetVectorOptions(
   const regSetVectorDescriptions = /^SetVector_Descriptions[\t ]*:[\t ]*(.*)$/;
   const regSetVectorDefaultValues =
     /^SetVector_DefaultValues[\t ]*:[\t ]*(.*)$/;
+  const regSetVectorStep = /^SetVector_Step[\t ]*:[\t ]*(.*)$/;
 
   const matchedDescriptionsArray = __getAllParamsFromSGSPcomment(
     sGSPcomments,
@@ -888,6 +892,10 @@ function __setGUISetVectorOptions(
   const matchedDefaultValuesArray = __getAllParamsFromSGSPcomment(
     sGSPcomments,
     regSetVectorDefaultValues
+  );
+  const matchedStepArray = __getAllParamsFromSGSPcomment(
+    sGSPcomments,
+    regSetVectorStep
   );
 
   if (
@@ -919,6 +927,16 @@ function __setGUISetVectorOptions(
     json.guiOptions.setVector[socketName] =
       json.guiOptions.setVector[socketName] ?? {};
     json.guiOptions.setVector[socketName].defaultValues = defaultValues;
+  }
+
+  for (let i = 0; i < matchedStepArray.length; i++) {
+    const matchedStep = matchedStepArray[i];
+    const params = matchedStep.split(/[\t ]+/);
+    const socketName = params.shift() as string;
+    const step = Number(params[0]);
+    json.guiOptions.setVector[socketName] =
+      json.guiOptions.setVector[socketName] ?? {};
+    json.guiOptions.setVector[socketName].step = step;
   }
 }
 
