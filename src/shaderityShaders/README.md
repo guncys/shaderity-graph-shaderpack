@@ -256,6 +256,21 @@ If you want to specify the description of multiple elements, such as vector 2, s
   - `0 0 0` (Vec3)
   - `0 0 0 0` (Vec4)
 
+### SetVector_Step
+
+This parameter is only used when the GUIMode is in SetVector mode.
+
+The 'step' specifies the interval between legal numbers in an <input> element.
+
+``` glsl
+// <SGSP> SetVector_Step: (value)
+
+// e.g.
+// <SGSP> SetVector_Step: u_inInt 1
+```
+
+- Implementation Note: When the GUIMode is in SetVector mode and this parameter is not specified, the default value is 0.01:
+
 ### SetMatrix_DefaultValues
 
 This parameter is only used when the GUIMode is in SetMatrix mode.

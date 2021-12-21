@@ -216,6 +216,7 @@ If there is no value to be specified for a VectorOption, there is no need to cre
 |:--|:--|:--|:--|
 |descriptions|`string`|Description of each element|No|
 |defaultValues|`number[]`|Default value of each element|No|
+|step|`number`|Interval between legal numbers in an input element|No|
 
 - Type: `Object`
 
@@ -223,8 +224,7 @@ If there is no value to be specified for a VectorOption, there is no need to cre
 
 The description of each element.
 
-If this value is not set, the default value of the library that uses this library will be applied.
-Specify ['x', 'y', 'z', 'w'] as the default value in the library.
+If this value is not set, the library that uses this library should use ['x', 'y', 'z', 'w'] as the default value.
 
 - Type: `string[1-4]`
 
@@ -234,10 +234,19 @@ Specify ['x', 'y', 'z', 'w'] as the default value in the library.
 
 The default value of each element.
 
-If this value is not set, the default value of the library that uses this library will be applied.
-Specify [0, 0, 0, 0] as the default value in the library.
+If this value is not set, the library that uses this library should use [0, 0, 0, 0] as the default value.
 
 - Type: `number[1-4]`
+
+- Required: No
+
+### VectorOption.step
+
+The interval between legal numbers in an input element.
+
+If this value is not set, the library that uses this library should use 0.01 as the default value.
+
+- Type: `number`
 
 - Required: No
 
