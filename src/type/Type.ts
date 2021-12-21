@@ -36,6 +36,7 @@ export interface PullDownOption {
 export interface VectorOption {
   descriptions?: string[];
   defaultValues?: number[];
+  step?: number;
 }
 
 export interface SetVectorOption {

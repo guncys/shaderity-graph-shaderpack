@@ -1,5 +1,5 @@
-import {AvailableShaderStage, GUIMode} from '../../type/Enum';
-import {SamplerInputNodeData} from '../../type/Type';
+import {AvailableShaderStage, GUIMode} from '../../../type/Enum';
+import {SamplerInputNodeData} from '../../../type/Type';
 
 export default {
   nodeType: 'samplerInputNode',
