@@ -1,4 +1,4 @@
-// <SGSP> NodeName: vertex position
+// <SGSP> NodeName: Vertex Position
 // <SGSP> Category: Utility Output
 // <SGSP> AvailableShaderStage: Vertex
 // <SGSP> GUIMode: Standard
