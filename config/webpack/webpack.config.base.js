@@ -6,6 +6,16 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.json$/,
+        exclude: /node_modules/,
+        use: ['json-loader'],
+      },
+      {
+        test: /\.ts$/,
+        exclude: [/node_modules/],
+        loader: 'ts-loader',
+      },
+      {
         test: /\.glsl$/,
         exclude: /node_modules/,
         use: [
@@ -16,16 +26,6 @@ module.exports = {
             ),
           },
         ],
-      },
-      {
-        test: /\.json$/,
-        exclude: /node_modules/,
-        use: ['json-loader'],
-      },
-      {
-        test: /\.ts$/,
-        exclude: [/node_modules/],
-        loader: 'ts-loader',
       },
     ],
   },
