@@ -22,7 +22,19 @@ module.exports = {
           {
             loader: path.resolve(
               __dirname,
-              './../../loader/dist/loader/shaderpackLoader.js'
+              './../../loader/dist/loader/ShaderpackLoader.js'
+            ),
+          },
+        ],
+      },
+      {
+        test: /\.ts$/,
+        include: /ShaderPack.ts/,
+        use: [
+          {
+            loader: path.resolve(
+              __dirname,
+              './../../loader/dist/loader/NodeDefinitionsImportLoader.js'
             ),
           },
         ],
