@@ -13,6 +13,7 @@
     "setvector",
     "SGSP",
     "Shaderpack",
+    "srgb",
     "texcoord",
     "uniformvalue",
     "vertexandfragment"
