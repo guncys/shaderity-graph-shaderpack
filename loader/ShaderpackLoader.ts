@@ -270,7 +270,8 @@ function __getShaderFuncArgs(
     i < splittedShaderFunctionCode.length;
     i++
   ) {
-    voidFunc += splittedShaderFunctionCode[i];
+    // remove comment (start from '//' only)
+    voidFunc += splittedShaderFunctionCode[i].split('//')[0];
 
     matchedFuncArgument = voidFunc.match(regVoidFuncArgument);
     if (matchedFuncArgument != null) {
