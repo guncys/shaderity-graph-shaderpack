@@ -207,7 +207,7 @@ function __setShaderFunctionNameAndGetShaderFunctionLineNumber(
  */
 function __setSocketData(json: ShaderityNodeData, shaderFuncArgs: string[]) {
   const regArg =
-    /^[\t ]*(in|out)[\t ]*(highp|mediump|lowp|)[\t ]+(\w+)[\t ]+(\w+)$/;
+    /^[\t ]*(in|out)[\t ]*(highp|mediump|lowp|)[\t ]+(\w+)[\t ]+(.+)$/;
 
   for (let i = 0; i < shaderFuncArgs.length; i++) {
     const argString = shaderFuncArgs[i];
