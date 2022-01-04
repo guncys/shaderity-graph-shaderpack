@@ -703,7 +703,8 @@ function __removeNonSharingUniformVariableName(
     regSharingUniformVariable
   ).trim();
 
-  const sharingUniformVariableNames = sharingUniformVariable.split(/[\t ]+/);
+  const sharingUniformVariableNames =
+    sharingUniformVariable.split(/[\t ]+(?=u_.+)/);
 
   for (const socketData of json.socketDataArray) {
     const uniformSocketData = socketData as UniformInputSocketData;
