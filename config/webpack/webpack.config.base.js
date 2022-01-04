@@ -6,18 +6,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.glsl$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: path.resolve(
-              __dirname,
-              './../../loader/dist/loader/shaderpackLoader.js'
-            ),
-          },
-        ],
-      },
-      {
         test: /\.json$/,
         exclude: /node_modules/,
         use: ['json-loader'],
@@ -26,6 +14,30 @@ module.exports = {
         test: /\.ts$/,
         exclude: [/node_modules/],
         loader: 'ts-loader',
+      },
+      {
+        test: /\.glsl$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: path.resolve(
+              __dirname,
+              './../../loader/dist/loader/ShaderpackLoader.js'
+            ),
+          },
+        ],
+      },
+      {
+        test: /\.ts$/,
+        include: /ShaderPack.ts/,
+        use: [
+          {
+            loader: path.resolve(
+              __dirname,
+              './../../loader/dist/loader/NodeDefinitionsImportLoader.js'
+            ),
+          },
+        ],
       },
     ],
   },
