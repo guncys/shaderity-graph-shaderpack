@@ -1001,7 +1001,9 @@ function __changeSocketName(
   );
 
   for (let i = 0; i < socketNames.length; i++) {
-    const [variableName, socketName] = socketNames[i].split(/[\t ]+/, 2);
+    const [, variableName, socketName] = socketNames[i].match(
+      /^(\w+)[\t ]+(.*)$/
+    ) as RegExpExecArray;
 
     const isUniformVariable = variableName.match(/^u_/) != null;
     if (isUniformVariable) {

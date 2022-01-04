@@ -1,4 +1,4 @@
-// <SGSP> NodeName: input position
+// <SGSP> NodeName: Input Position
 // <SGSP> Category: Input Geometry
 // <SGSP> AvailableShaderStage: Vertex
 // <SGSP> GUIMode: PullDown

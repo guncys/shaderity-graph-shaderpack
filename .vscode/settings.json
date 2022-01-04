@@ -1,7 +1,13 @@
 {
   "cSpell.words": [
+    "bitangent",
     "cacheable",
     "glsl",
+    "highp",
+    "inversesqrt",
+    "lowp",
+    "mediump",
+    "perp",
     "setmatrix",
     "settexture",
     "setvector",
@@ -13,5 +19,8 @@
   ],
   "markdownlint.customRules": [
     "\"MD033\": false"
+  ],
+  "cSpell.enableFiletypes": [
+    "glsl"
   ]
 }

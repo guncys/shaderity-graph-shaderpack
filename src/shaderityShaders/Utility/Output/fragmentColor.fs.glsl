@@ -1,4 +1,4 @@
-// <SGSP> NodeName: fragment color
+// <SGSP> NodeName: Fragment Color
 // <SGSP> Category: Utility Output
 // <SGSP> AvailableShaderStage: Fragment
 // <SGSP> GUIMode: Standard
