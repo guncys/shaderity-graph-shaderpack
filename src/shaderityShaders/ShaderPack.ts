@@ -1,5 +1,9 @@
 import {AbstractNodeData} from './../type/Type';
 
+import normalTextureScale from './Artistic/Normal/normalTextureScale.glsl';
+import perturbNormal from './Artistic/Normal/perturbNormal.fs.glsl';
+import occlusionStrength from './Artistic/Occlusion/occlusionStrength.glsl';
+
 import floatToVector2 from './Channel/AddElements/floatToVector2.glsl';
 import floatToVector3 from './Channel/AddElements/floatToVector3.glsl';
 import floatToVector4 from './Channel/AddElements/floatToVector4.glsl';
@@ -45,6 +49,9 @@ import fragmentColor from './Utility/Output/fragmentColor.fs.glsl';
 import vertexPosition from './Utility/Output/vertexPosition.vs.glsl';
 
 export const ShaderPack: AbstractNodeData[] = [
+  normalTextureScale,
+  perturbNormal,
+  occlusionStrength,
   floatToVector2,
   floatToVector3,
   floatToVector4,
