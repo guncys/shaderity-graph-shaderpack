@@ -1,11 +1,11 @@
 // <SGSP> NodeName: And
 // <SGSP> Category: Utility Logic
 
-// <SGSP> SocketName: outBoolean out
-void and(in bool A, in bool B, out bool outBoolean) {
+// <SGSP> SocketName: outBool out
+void and(in bool A, in bool B, out bool outBool) {
   if (A && B) {
-    outBoolean = true;
+    outBool = true;
   } else {
-    outBoolean = false;
+    outBool = false;
   }
 }
