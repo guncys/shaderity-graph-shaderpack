@@ -2,6 +2,7 @@
   "cSpell.words": [
     "bitangent",
     "cacheable",
+    "commitlint",
     "glsl",
     "highp",
     "inversesqrt",
@@ -12,7 +13,9 @@
     "settexture",
     "setvector",
     "SGSP",
+    "shaderity",
     "Shaderpack",
+    "srgb",
     "texcoord",
     "uniformvalue",
     "vertexandfragment"
